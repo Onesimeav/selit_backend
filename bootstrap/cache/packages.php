@@ -27,6 +27,17 @@
       0 => 'Carbon\\Laravel\\ServiceProvider',
     ),
   ),
+  'nextapps/laravel-verification-code' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'NextApps\\VerificationCode\\VerificationCodeServiceProvider',
+    ),
+    'aliases' => 
+    array (
+      'VerificationCode' => 'NextApps\\VerificationCode\\VerificationCode',
+    ),
+  ),
   'nunomaduro/collision' => 
   array (
     'providers' => 

@@ -7,6 +7,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use NextApps\VerificationCode\VerificationCode;
 
 class UserAuthenticationController extends Controller
 {
@@ -21,6 +22,7 @@ class UserAuthenticationController extends Controller
             'email' => $email,
             'password' => Hash::make($password)
         ]);
+        VerificationCode::send($email);
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
@@ -63,5 +65,39 @@ class UserAuthenticationController extends Controller
         return response()->json([
             'message' => 'Succesfully Logged out'
         ], 200);
+    }
+
+    public function resendVerificationCode(): JsonResponse
+    {
+        VerificationCode::send(auth()->user()->email);
+
+        return response()->json([
+            'message'=>'Verification code sent successfully'
+        ],200);
+    }
+
+    public function verifyCode(Request $request): JsonResponse
+    {
+        $code = $request->input('code');
+        $verify=VerificationCode::verify($code,auth()->user()->email);
+
+        if($verify){
+            auth()->user()->markEmailAsVerified();
+            return response()->json([
+                'message'=>'Email verified successfully'
+            ]);
+        }else{
+            return response()->json([
+                'message'=>'Incorrect verification code'
+            ]);
+        }
+
+    }
+
+    public function testRoute(): JsonResponse
+    {
+        return response()->json([
+            'message'=>'Just a test route'
+        ]);
     }
 }
