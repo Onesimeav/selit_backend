@@ -8,6 +8,8 @@ Route::prefix('v1')->group(function () {
     Route::post('login', [UserAuthenticationController::class, 'login']);
     Route::post('register', [UserAuthenticationController::class, 'register']);
     Route::get('send-test-mail', [MailController::class, 'index']);
+    Route::get('/google-auth',[UserAuthenticationController::class,'redirectToGoogleAuth']);
+    Route::get('/google-auth-callback',[UserAuthenticationController::class, 'handleGoogleAuthCallback']);
 });
 
 //These routes are protected using middleware
