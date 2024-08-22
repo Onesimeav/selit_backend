@@ -2,26 +2,34 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\LoginRequest;
+use App\Http\Requests\RegisterRequest;
 use App\Models\User;
+use Exception;
+use GuzzleHttp\Exception\ClientException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Laravel\Socialite\Facades\Socialite;
 use NextApps\VerificationCode\VerificationCode;
 
 class UserAuthenticationController extends Controller
 {
-    public function register(Request $request): JsonResponse
+    public function register(RegisterRequest $request): JsonResponse
     {
-        $name = $request->input('name');
-        $email = strtolower($request->input('email'));
-        $password = $request->input('password');
+        $validated = $request->validated();
+
+        $name = $validated->input('name');
+        $email = $validated->input('email');
+        $password = $validated->input('password');
 
         $user = User::create([
             'name' => $name,
             'email' => $email,
             'password' => Hash::make($password)
         ]);
+
         VerificationCode::send($email);
 
         $token = $user->createToken('auth_token')->plainTextToken;
@@ -33,10 +41,12 @@ class UserAuthenticationController extends Controller
         ], 201);
     }
 
-    public function login(Request $request): JsonResponse
+    public function login(LoginRequest $request): JsonResponse
     {
-        $email = strtolower($request->input('email'));
-        $password = $request->input('password');
+        $validated = $request->validated();
+
+        $email = $validated->input('email');
+        $password = $validated->input('password');
 
         $credentials = [
             'email' => $email,
@@ -91,6 +101,46 @@ class UserAuthenticationController extends Controller
                 'message'=>'Incorrect verification code'
             ]);
         }
+
+    }
+
+    public function redirectToGoogleAuth(): JsonResponse
+    {
+        return response()->json([
+            'url' => Socialite::driver('google')
+                ->stateless()
+                ->redirect()
+                ->getTargetUrl(),
+        ]);
+    }
+
+    public function handleGoogleAuthCallback(): JsonResponse
+    {
+        try {
+            $socialiteUser = Socialite::driver('google')->stateless()->user();
+        } catch (ClientException $e) {
+            return response()->json(['error' => 'Invalid credentials provided.'], 422);
+        }
+
+        $user = User::query()
+            ->firstOrCreate(
+                [
+                    'email' => $socialiteUser->email,
+                ],
+                [
+                    'email_verified_at' => now(),
+                    'name' => $socialiteUser->name,
+                    'google_id' => $socialiteUser->id,
+                ]
+            );
+
+        $token =$user->createToken('google-token')->plainTextToken;
+
+        return response()->json([
+            'user' => $user,
+            'access_token' => $token,
+            'token_type' => 'Bearer',
+        ]);
 
     }
 
