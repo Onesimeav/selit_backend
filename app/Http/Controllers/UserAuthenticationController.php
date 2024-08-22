@@ -119,7 +119,10 @@ class UserAuthenticationController extends Controller
         try {
             $socialiteUser = Socialite::driver('google')->stateless()->user();
         } catch (ClientException $e) {
-            return response()->json(['error' => 'Invalid credentials provided.'], 422);
+            return response()->json([
+                'error' => 'Invalid credentials provided.',
+                'ERROR'=>$e
+            ], 422);
         }
 
         $user = User::query()
