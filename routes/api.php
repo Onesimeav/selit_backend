@@ -10,6 +10,8 @@ Route::prefix('v1')->group(function () {
     Route::get('send-test-mail', [MailController::class, 'index']);
     Route::get('/google-auth',[UserAuthenticationController::class,'redirectToGoogleAuth']);
     Route::get('/google-auth-callback',[UserAuthenticationController::class, 'handleGoogleAuthCallback']);
+    Route::post('/forgot-password',[UserAuthenticationController::class,'forgotPassword']);
+    Route::post('/reset-password',[UserAuthenticationController::class,'verifyPasswordCode']);
 });
 
 //These routes are protected using middleware

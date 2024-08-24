@@ -4,14 +4,8 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class RegisterRequest extends FormRequest
+class VerifyPasswordCodeRequest extends FormRequest
 {
-    /**
-     * Indicates if the validator should stop on the first rule failure.
-     *
-     * @var bool
-     */
-    protected $stopOnFirstFailure = true;
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -28,9 +22,8 @@ class RegisterRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|lowercase|email|max:255|unique:users',
-            'password' => 'required|min:8',
+            'code' => 'required|string|exists:reset_code_passwords',
+            'password' => 'required|string|min:6',
         ];
     }
 }
