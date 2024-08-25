@@ -2,8 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ForgotPasswordRequest;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
+use App\Http\Requests\VerifyPasswordCodeRequest;
+use App\Mail\SendCodeResetPassword;
+use App\Models\ResetCodePassword;
 use App\Models\User;
 use Exception;
 use GuzzleHttp\Exception\ClientException;
@@ -11,6 +15,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Laravel\Socialite\Facades\Socialite;
 use NextApps\VerificationCode\VerificationCode;
 
@@ -18,11 +23,9 @@ class UserAuthenticationController extends Controller
 {
     public function register(RegisterRequest $request): JsonResponse
     {
-        $validated = $request->validated();
-
-        $name = $validated->input('name');
-        $email = $validated->input('email');
-        $password = $validated->input('password');
+        $name = $request->input('name');
+        $email = $request->input('email');
+        $password = $request->input('password');
 
         $user = User::create([
             'name' => $name,
@@ -43,10 +46,8 @@ class UserAuthenticationController extends Controller
 
     public function login(LoginRequest $request): JsonResponse
     {
-        $validated = $request->validated();
-
-        $email = $validated->input('email');
-        $password = $validated->input('password');
+        $email = $request->input('email');
+        $password = $request->input('password');
 
         $credentials = [
             'email' => $email,
@@ -145,6 +146,53 @@ class UserAuthenticationController extends Controller
             'token_type' => 'Bearer',
         ]);
 
+    }
+
+    public  function forgotPassword(ForgotPasswordRequest $request): JsonResponse
+    {
+        // Delete all old code that user send before.
+        ResetCodePassword::where('email', $request->email)->delete();
+
+        // Create a new code
+        $codeData = ResetCodePassword::create([
+            'code'=>mt_rand(100000, 999999),
+            'email'=>$request->email,
+        ]);
+
+        // Send email to user
+        Mail::to($request->email)->send(new SendCodeResetPassword($codeData->code));
+
+        return response()->json([
+            'message'=>'New password sent to the user mail successfully'
+        ]);
+    }
+
+
+    public function verifyPasswordCode(VerifyPasswordCodeRequest $request)
+    {
+        // find the code
+        $passwordReset = ResetCodePassword::firstWhere('code', $request->code);
+
+        // check if it does not expire: the time is one hour
+        if ($passwordReset->created_at > now()->addHour()) {
+            $passwordReset->delete();
+            return response()->json([
+                'message'=>'Password code already expired'
+            ],422);
+        }
+
+        // find user's email
+        $user = User::firstWhere('email', $passwordReset->email);
+
+        // update user password
+        $user->update($request->only('password'));
+
+        // delete current code
+        $passwordReset->delete();
+
+        return response()->json([
+            'message'=>'Password successfully reset',
+        ]);
     }
 
     public function testRoute(): JsonResponse
