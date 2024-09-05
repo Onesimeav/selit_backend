@@ -13,8 +13,8 @@ class ShopController extends Controller
     public function createShop(ShopCreationRequest $request): JsonResponse
     {
         //images upload on cloudinary
-        $logo = $request->file('logo')->storeOnCloudinary('logo');
-        $banner = $request->file('banner')->storeOnCloudinary('banner');
+        $logo = $request->file('logo')->storeOnCloudinary('shops/logo');
+        $banner = $request->file('banner')->storeOnCloudinary('shops/banner');
 
         //shop creation
        $shop = Shop::create([
