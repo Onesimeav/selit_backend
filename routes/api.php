@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ShopController;
 use App\Http\Controllers\UserAuthenticationController;
 use App\Http\Controllers\MailController;
 use Illuminate\Support\Facades\Route;
@@ -14,7 +15,7 @@ Route::prefix('v1')->group(function () {
     Route::post('/reset-password',[UserAuthenticationController::class,'verifyPasswordCode']);
 });
 
-//These routes are protected using middleware
+//only logged-in users
 Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
     Route::get('resend-verification-code',[UserAuthenticationController::class,'resendVerificationCode']);
     Route::post('verify-code',[UserAuthenticationController::class,'verifyCode']);
@@ -23,5 +24,6 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
 
 //Only for verified users
 Route::prefix('v1')->middleware(['auth:sanctum','verified'])->group(function () {
+    Route::post('create-shop',[ShopController::class,'createShop']);
     Route::get('test-route',[UserAuthenticationController::class,'testRoute']);
 });
