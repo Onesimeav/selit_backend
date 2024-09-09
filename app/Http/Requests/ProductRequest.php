@@ -2,11 +2,9 @@
 
 namespace App\Http\Requests;
 
-use App\Enums\ProductTypeEnum;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
-class ShopCreationRequest extends FormRequest
+class ProductRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,10 +23,14 @@ class ShopCreationRequest extends FormRequest
     {
         return [
             'name'=>'required|string|max:255',
-            'description' =>'required|string',
-            'logo'=>'required|mimes:jpg,png|extensions:jpg,png',
-            'banner'=>'required|mimes:jpg,png|extensions:jpg,png',
-            'product_type'=>['required', Rule::in(array_column(ProductTypeEnum::cases(), 'value'))]
+            'description'=>'required|string',
+            'price'=>'required|integer',
+            'images' => 'required|array',
+            'images.*' => 'image|mimes:jpeg,png',
+            'videos' => 'required|array',
+            'videos.*' => 'file|mimes:mp4,mov',
+            'specification'=>'required|array',
+            'product_id'=>'integer'
         ];
     }
 }
