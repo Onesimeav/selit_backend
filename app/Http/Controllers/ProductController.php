@@ -38,7 +38,7 @@ class ProductController extends Controller
         $videos= $request->file('videos');
 
         foreach ($videos as $item) {
-            $video = $item->storeOnCloudinary('product/videos');
+            $video = $item->storeOnCloudinary('products/videos');
 
             //store the media
             Media::create([
@@ -49,7 +49,7 @@ class ProductController extends Controller
         }
 
         //store specifications
-        $specifications=$request->input('specifications');
+        $specifications=$request->input('specification');
         foreach ($specifications as $name=>$value) {
             Specification::create([
                 'name'=>$name,
