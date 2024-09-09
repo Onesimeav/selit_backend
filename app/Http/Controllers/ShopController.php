@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Http\Requests\ShopCreationRequest;
 use App\Models\Shop;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Js;
 
 
 class ShopController extends Controller
@@ -27,7 +29,24 @@ class ShopController extends Controller
        ]);
 
        return response()->json([
-           'message'=>'Shop created succesfully'
+           'message'=>'Shop created succesfully',
+           'shop_id'=>$shop->id
        ]);
     }
+
+    public function chooseTemplate(Request $request): JsonResponse
+    {
+        $template_id = $request->input('template_id');
+        $shop_id = $request->input('shop_id');
+
+        $shop= Shop::findOrFail($shop_id);
+        $shop->template_id=$template_id;
+        $shop->save();
+
+        return response()->json([
+            'message'=>'Template added successfully',
+            'shop_id'=>$shop->id,
+        ]);
+    }
+
 }

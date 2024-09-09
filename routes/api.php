@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ShopController;
+use App\Http\Controllers\TemplateController;
 use App\Http\Controllers\UserAuthenticationController;
 use App\Http\Controllers\MailController;
 use Illuminate\Support\Facades\Route;
@@ -24,6 +26,20 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
 
 //Only for verified users
 Route::prefix('v1')->middleware(['auth:sanctum','verified'])->group(function () {
-    Route::post('create-shop',[ShopController::class,'createShop']);
+
     Route::get('test-route',[UserAuthenticationController::class,'testRoute']);
+    //template
+    Route::post('create-template',[TemplateController::class,'createTemplate']);
+    Route::post('search-template',[TemplateController::class,'searchTemplate']);
+    Route::post('update-template',[TemplateController::class,'updateTemplate']);
+    Route::post('delete-template',[TemplateController::class,'deleteTemplate']);
+    //shop
+    Route::post('create-shop',[ShopController::class,'createShop']);
+    Route::post('choose-shop-template',[ShopController::class,'chooseTemplate']);
+    Route::post('add-product-to-shop',[ProductController::class,'addToShop']);
+    //product
+    Route::post('create-product',[ProductController::class,'createProduct']);
+    Route::post('search-product',[ProductController::class,'searchProduct']);
+    Route::post('update-product',[ProductController::class,'updateProduct']);
+    Route::post('delete-product',[ProductController::class,'deleteProduct']);
 });

@@ -19,7 +19,9 @@ return new class extends Migration
             $table->string('banner');
             $table->string('product_type');
             $table->unsignedBigInteger('owner_id');
+            $table->unsignedSmallInteger('template_id')->nullable();
             $table->foreign('owner_id')->references('id')->on('users')->onDelete('cascade')->onUpdate('cascade');
+            $table->foreign('template_id')->references('id')->on('templates')->onDelete('cascade')->onUpdate('cascade');
             $table->timestamps();
         });
     }
