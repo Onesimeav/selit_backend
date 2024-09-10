@@ -25,6 +25,7 @@ class ShopController extends Controller
            'banner'=>$banner->getSecurePath(),
            'product_type'=>$request->input('product_type'),
            'owner_id'=>Auth::id(),
+           'subdomain'=>$request->input('subdomain'),
        ]);
 
        return response()->json([
