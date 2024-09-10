@@ -19,13 +19,17 @@ class TemplateController extends Controller
         return response()->json([
             'message'=>'Template created successfully',
             'template_id'=>$template->id,
-        ]);
+        ],201);
     }
 
     public function searchTemplate(Request $request): JsonResponse
     {
         $search = $request->input('search');
-        $result = Template::where('name','like',"%$search%")->get();
+        if ($search!=null){
+            $result = Template::where('name','like',"%$search%")->get();
+        }else{
+            $result = Template::all();
+        }
 
         return response()->json([
             'results'=>$result,
@@ -53,9 +57,7 @@ class TemplateController extends Controller
 
         Template::where('id', $template_id)->delete();
 
-        return response()->json([
-            'message'=>'Template deleted successfully'
-        ],'204');
+        return response()->json([],204);
     }
 
 }

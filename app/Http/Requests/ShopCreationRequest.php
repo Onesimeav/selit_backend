@@ -28,7 +28,8 @@ class ShopCreationRequest extends FormRequest
             'description' =>'required|string',
             'logo'=>'required|mimes:jpg,png|extensions:jpg,png',
             'banner'=>'required|mimes:jpg,png|extensions:jpg,png',
-            'product_type'=>['required', Rule::in(array_column(ProductTypeEnum::cases(), 'value'))]
+            'product_type'=>['required', Rule::in(array_column(ProductTypeEnum::cases(), 'value'))],
+            'subdomain'=>'required|string|max:50',
         ];
     }
 }

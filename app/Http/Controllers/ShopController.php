@@ -7,7 +7,6 @@ use App\Models\Shop;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Js;
 
 
 class ShopController extends Controller
@@ -40,13 +39,36 @@ class ShopController extends Controller
         $shop_id = $request->input('shop_id');
 
         $shop= Shop::findOrFail($shop_id);
-        $shop->template_id=$template_id;
-        $shop->save();
+        if ($shop->owner_id==Auth::id()){
+            $shop->template_id=$template_id;
+            $shop->save();
+
+            return response()->json([
+                'message'=>'Template added successfully',
+                'shop_id'=>$shop->id,
+            ]);
+        }
+            return response()->json([
+                'message'=>"The user doesn't own this shop"
+            ],401);
+
+    }
+
+    public function publishShop(Request $request): JsonResponse
+    {
+        $shop_id = $request->input('shop_id');
+        $shop = Shop::findOrFail($shop_id);
+        if ($shop->owner_id == Auth::id())
+        {
+            $shop->publish = true;
+            return response()->json([
+                'message'=>"Shop published"
+            ]);
+        }
 
         return response()->json([
-            'message'=>'Template added successfully',
-            'shop_id'=>$shop->id,
-        ]);
+            'message'=>"The user doesn't own this shop"
+        ],401);
     }
 
 }
