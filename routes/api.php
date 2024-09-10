@@ -37,6 +37,7 @@ Route::prefix('v1')->middleware(['auth:sanctum','verified'])->group(function () 
     Route::post('create-shop',[ShopController::class,'createShop']);
     Route::post('choose-shop-template',[ShopController::class,'chooseTemplate']);
     Route::post('add-product-to-shop',[ProductController::class,'addToShop']);
+    Route::post('publish-shop',[ShopController::class, 'publishShop']);
     //product
     Route::post('create-product',[ProductController::class,'createProduct']);
     Route::get('search-product',[ProductController::class,'searchProduct']);
