@@ -6,4 +6,8 @@ Route::get('/', function () {
     return ['Laravel' => app()->version()];
 });
 
-require __DIR__.'/auth.php';
+//shops redirection
+Route::group(['domain' => '{subdomain}.example.com'], function () {
+    Route::get('/', 'SubdomainController@index');
+});
+

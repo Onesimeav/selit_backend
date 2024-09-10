@@ -30,16 +30,17 @@ Route::prefix('v1')->middleware(['auth:sanctum','verified'])->group(function () 
     Route::get('test-route',[UserAuthenticationController::class,'testRoute']);
     //template
     Route::post('create-template',[TemplateController::class,'createTemplate']);
-    Route::post('search-template',[TemplateController::class,'searchTemplate']);
-    Route::post('update-template',[TemplateController::class,'updateTemplate']);
-    Route::post('delete-template',[TemplateController::class,'deleteTemplate']);
+    Route::get('search-template',[TemplateController::class,'searchTemplate']);
+    Route::put('update-template',[TemplateController::class,'updateTemplate']);
+    Route::delete('delete-template',[TemplateController::class,'deleteTemplate']);
     //shop
     Route::post('create-shop',[ShopController::class,'createShop']);
     Route::post('choose-shop-template',[ShopController::class,'chooseTemplate']);
     Route::post('add-product-to-shop',[ProductController::class,'addToShop']);
+    Route::post('publish-shop',[ShopController::class, 'publishShop']);
     //product
     Route::post('create-product',[ProductController::class,'createProduct']);
-    Route::post('search-product',[ProductController::class,'searchProduct']);
-    Route::post('update-product',[ProductController::class,'updateProduct']);
-    Route::post('delete-product',[ProductController::class,'deleteProduct']);
+    Route::get('search-product',[ProductController::class,'searchProduct']);
+    Route::put('update-product',[ProductController::class,'updateProduct']);
+    Route::delete('delete-product',[ProductController::class,'deleteProduct']);
 });

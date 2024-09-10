@@ -15,6 +15,7 @@ class Product extends Model
         'description',
         'price',
         'shop_id',
+        'owner_id',
     ];
 
     protected $with = [

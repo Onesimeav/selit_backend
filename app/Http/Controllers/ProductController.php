@@ -5,9 +5,11 @@ namespace App\Http\Controllers;
 use App\Http\Requests\ProductRequest;
 use App\Models\Media;
 use App\Models\Product;
+use App\Models\Shop;
 use App\Models\Specification;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ProductController extends Controller
 {
@@ -18,60 +20,65 @@ class ProductController extends Controller
             'name'=>$request->input('name'),
             'description'=>$request->input('description'),
             'price'=>$request->input('price'),
+            'owner_id'=>Auth::id(),
         ]);
 
         $images=$request->file('images');
+        $mediaData=[];
         //upload images on cloudinary
         foreach ( $images as $item) {
-            $image = $item->storeOnCloudinary('products/images');
-
-            //store the media
-            Media::create([
+            $image= $item->storeOnCloudinary('products/images');
+            $mediaData[] = [
                 'url'=>$image->getSecurePath(),
                 'type'=>'image',
-                'product_id'=>$product->id,
-            ]);
-
+            ];
         }
 
         //upload videos on cloudinary
         $videos= $request->file('videos');
-
         foreach ($videos as $item) {
             $video = $item->storeOnCloudinary('products/videos');
-
-            //store the media
-            Media::create([
-                'url'=>$video->getSecurePath(),
+            $mediaData[] = [
+                'url'=>$video->getSecuredPath(),
                 'type'=>'video',
-                'product_id'=>$product->id,
-            ]);
+            ];
         }
+
+        //store the medias
+        $product->medias()->createMany($mediaData);
 
         //store specifications
         $specifications=$request->input('specification');
+        $specificationsArray = [];
         foreach ($specifications as $name=>$value) {
-            Specification::create([
+            $specificationsArray = [
                 'name'=>$name,
                 'value'=>$value,
-                'product_id'=>$product->id,
-            ]);
+            ];
         }
+        $product->specifications()->createMany($specificationsArray);
 
         return response()->json([
             'message'=>'Product created succesfully',
             'product_id'=>$product->id,
-        ],'201');
+        ],201);
     }
 
     public function searchProduct(Request $request): JsonResponse
     {
         $search = $request->input('search');
 
-        $product = Product::where('name','lke',"%$search%");
+        if ($search!=null){
+            $product = Product::where('name', 'like', "%$search%")
+                ->where('owner_id', Auth::id())
+                ->get();
+        }else{
+            $product = Product::where('owner_id', Auth::id())
+                ->get();
+        }
 
         return response()->json([
-            'result'=>$product
+            'result'=>$product,
         ]);
     }
 
@@ -80,24 +87,37 @@ class ProductController extends Controller
         $product_id = $request->input('product_id');
 
         $product = Product::findOrFail($product_id);
-        $product->name=$request->input('name');
-        $product->description=$request->input('description');
-        $product->price=$request->input('price');
-        $product->save();
+        if ($product->owner_id==Auth::id())
+        {
+            $product->name=$request->input('name');
+            $product->description=$request->input('description');
+            $product->price=$request->input('price');
+            $product->save();
+
+            return response()->json([
+                'message'=>'Product updated successfully'
+            ]);
+        }
 
         return response()->json([
-            'message'=>'Product updated successfully'
-        ]);
+            'message'=>"The user doesn't own this product"
+        ],401);
     }
 
     public function deleteProduct(Request $request):JsonResponse
     {
         $product_id=$request->input('product_id');
-        Product::where('id',$product_id)->delete();
+
+        $product= Product::where('id',$product_id);
+        if ($product->owner_id==Auth::id())
+        {
+            $product->delete();
+            return response()->json([],204);
+        }
 
         return response()->json([
-            'message'=>'Deleted successfully'
-        ],'204');
+            'message'=>"The user doesn't this product"
+        ],401);
     }
 
     public function addToShop(Request $request)
@@ -106,11 +126,18 @@ class ProductController extends Controller
         $shop_id= $request->input('shop_id');
 
         $product = Product::findOrFail($product_id);
-        $product->shop_id=$shop_id;
-        $product->save();
+        $shop = Shop::findOrFail($shop_id);
+        if ($shop->owner_id == Auth::id() && $product->owner_id == Auth::id())
+        {
+            $product->shop_id=$shop_id;
+            $product->save();
 
+            return response()->json([
+                'message'=>'Product added successfully'
+            ]);
+        }
         return response()->json([
-            'message'=>'Product added successfully'
-        ]);
+            'message'=>"The user doesn't own this shop"
+        ],401);
     }
 }

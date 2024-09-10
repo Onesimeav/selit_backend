@@ -16,7 +16,9 @@ return new class extends Migration
             $table->string('name');
             $table->string('description');
             $table->integer('price');
+            $table->unsignedBigInteger('owner_id');
             $table->unsignedBigInteger('shop_id')->nullable();
+            $table->foreign('owner_id')->references('id')->on('users')->onDelete('cascade')->onUpdate('cascade');
             $table->foreign('shop_id')->references('id')->on('shops')->onDelete('cascade')->onUpdate('cascade');
             $table->timestamps();
         });

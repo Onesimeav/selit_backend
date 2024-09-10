@@ -18,6 +18,8 @@ class Shop extends Model
         'product_type',
         'owner_id',
         'template_id',
+        'subdomain',
+        'publish',
     ];
 
     public function products():HasMany
