@@ -22,7 +22,7 @@ class TemplateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name'=>'required|string|max:255|unique:templates',
+            'name'=>'required|string|max:255',
             'description'=>'required|string',
             'template_id'=>'integer'
         ];
