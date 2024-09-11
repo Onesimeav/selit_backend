@@ -28,7 +28,7 @@ class ProductController extends Controller
 
             //upload images on cloudinary
             foreach ( $images as $item) {
-                $image= $item->storeOnCloudinary();
+                $image= $item->storeOnCloudinary('products/images');
                 $mediaData[]= [
                     'url'=>$image->getSecurePath(),
                     'type'=>'image',
@@ -41,7 +41,7 @@ class ProductController extends Controller
             //upload videos on cloudinary
             $videos= $request->file('videos');
             foreach ($videos as $item) {
-                $video = $item->storeOnCloudinary();
+                $video = $item->storeOnCloudinary('products/images');
 
                 $mediaData[] = [
                     'url'=>$video->getSecurePath(),
