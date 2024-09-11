@@ -28,7 +28,7 @@ class ProductController extends Controller
         //upload images on cloudinary
         foreach ( $images as $item) {
             $image= $item->storeOnCloudinary('products/images');
-            $mediaData[] = [
+            $mediaData[]= [
                 'url'=>$image->getSecurePath(),
                 'type'=>'image',
             ];
@@ -51,7 +51,7 @@ class ProductController extends Controller
         $specifications=$request->input('specification');
         $specificationsArray = [];
         foreach ($specifications as $name=>$value) {
-            $specificationsArray = [
+            $specificationsArray[] = [
                 'name'=>$name,
                 'value'=>$value,
             ];
