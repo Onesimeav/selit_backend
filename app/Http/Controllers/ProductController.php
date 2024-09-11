@@ -23,29 +23,40 @@ class ProductController extends Controller
             'owner_id'=>Auth::id(),
         ]);
 
-        $images=$request->file('images');
         $mediaData=[];
-        //upload images on cloudinary
-        foreach ( $images as $item) {
-            $image= $item->storeOnCloudinary('products/images');
-            $mediaData[]= [
-                'url'=>$image->getSecurePath(),
-                'type'=>'image',
-            ];
+        if ($request->file('images')!=null)
+        {
+            $images=$request->file('images');
+
+            //upload images on cloudinary
+            foreach ( $images as $item) {
+                $image= $item->storeOnCloudinary('products/images');
+                $mediaData[]= [
+                    'url'=>$image->getSecurePath(),
+                    'type'=>'image',
+                ];
+            }
         }
 
-        //upload videos on cloudinary
-        $videos= $request->file('videos');
-        foreach ($videos as $item) {
-           $video = $item->storeOnCloudinary('products/videos');
-            $mediaData[] = [
-                'url'=>$video->getSecuredPath(),
-                'type'=>'video',
-            ];
+        if ($request->file('videos')!=null)
+        {
+            //upload videos on cloudinary
+            $videos= $request->file('videos');
+            foreach ($videos as $item) {
+                $video = $item->storeOnCloudinary('products/videos');
+                $mediaData[] = [
+                    'url'=>$video->getSecuredPath(),
+                    'type'=>'video',
+                ];
+            }
+
         }
 
-        //store the medias
-        $product->medias()->createMany($mediaData);
+        if ($mediaData!=[])
+        {
+            //store the medias
+            $product->medias()->createMany($mediaData);
+        }
 
         //store specifications
         $specifications=$request->input('specification');
