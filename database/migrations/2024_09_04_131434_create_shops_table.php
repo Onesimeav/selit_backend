@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('logo');
             $table->string('banner');
             $table->string('product_type');
-            $table->string('subdomain');
+            $table->string('subdomain')->unique();
             $table->boolean('publish')->default('false');
             $table->unsignedBigInteger('owner_id');
             $table->unsignedSmallInteger('template_id')->nullable();

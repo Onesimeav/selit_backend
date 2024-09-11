@@ -10,15 +10,16 @@ class SubdomainController extends Controller
 {
     public function index($domain)
     {
-        $shop = Shop::where('subdomain',$domain);
-        if (!$shop->publish)
-        {
+        $shop = Shop::where('subdomain', $domain)->first();
+        if (!$shop || !$shop->publish) {
             return view('404');
         }
-        $products = $shop->products();
+
+        $products = $shop->products;
         $template = Template::findOrFail($shop->template_id);
-        $template_name=$template->name;
-        return view("templates.{$template_name}.index",['shop'=>$shop,'products'=>$products]);
+        $template_name = $template->name;
+
+        return view("templates.{$template_name}.index", ['shop' => $shop, 'products' => $products]);
     }
 
 }
