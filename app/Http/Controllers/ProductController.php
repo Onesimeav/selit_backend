@@ -3,11 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProductRequest;
-use App\Jobs\UploadAndSaveProductMediaJob;
-use App\Models\Media;
 use App\Models\Product;
 use App\Models\Shop;
-use App\Models\Specification;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -16,7 +13,6 @@ class ProductController extends Controller
 {
     public function createProduct(ProductRequest $request):JsonResponse
     {
-
         //store the product
         $product= Product::create([
             'name'=>$request->input('name'),
@@ -24,15 +20,19 @@ class ProductController extends Controller
             'price'=>$request->input('price'),
             'owner_id'=>Auth::id(),
         ]);
-        $productId=$product->id;
 
+        $mediaData=[];
         if ($request->input('images')!=null)
         {
             $images=$request->file('images');
-            $mediaType='image';
+
             //upload images on cloudinary
             foreach ( $images as $item) {
-                UploadAndSaveProductMediaJob::dispatch($item,$mediaType,$productId);
+                $image= $item->getRealPath()->storeOnCloudinary();
+                $mediaData[]= [
+                    'url'=>$image->getSecurePath(),
+                    'type'=>'image',
+                ];
             }
         }
 
@@ -40,11 +40,21 @@ class ProductController extends Controller
         {
             //upload videos on cloudinary
             $videos= $request->file('videos');
-            $mediaType='videos';
             foreach ($videos as $item) {
-                UploadAndSaveProductMediaJob::dispatch($item,$mediaType,$productId);
+                $video = $item->getRealPath()->storeOnCloudinary();
+
+                $mediaData[] = [
+                    'url'=>$video->getSecurePath(),
+                    'type'=>'video',
+                ];
             }
 
+        }
+
+        if ($mediaData!=[])
+        {
+            //store the medias
+            $product->medias()->createMany($mediaData);
         }
 
         //store specifications
