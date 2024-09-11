@@ -27,10 +27,9 @@ class ProductController extends Controller
         if ($request->input('images')!=null)
         {
             $images=$request->file('images');
-
             //upload images on cloudinary
             foreach ( $images as $item) {
-                $image= $item->getRealPath()->storeOnCloudinary();
+                $image= $item->storeOnCloudinary('products/images');
                 Media::create([
                     'url'=>$image->getSecurePath(),
                     'type'=>'image',
@@ -44,14 +43,13 @@ class ProductController extends Controller
             //upload videos on cloudinary
             $videos= $request->file('videos');
             foreach ($videos as $item) {
-                $video = $item->getRealPath()->storeOnCloudinary();
+                $video = $item->getRealPath()->storeOnCloudinary('products/videos');
                 Media::create([
                     'url'=>$video->getSecurePath(),
                     'type'=>'video',
                     'product_id'=>$product->id,
                 ]);
             }
-
         }
 
         //store specifications
