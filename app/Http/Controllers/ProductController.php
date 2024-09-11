@@ -15,6 +15,7 @@ class ProductController extends Controller
 {
     public function createProduct(ProductRequest $request):JsonResponse
     {
+
         //store the product
         $product= Product::create([
             'name'=>$request->input('name'),
