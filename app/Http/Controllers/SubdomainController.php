@@ -12,7 +12,7 @@ class SubdomainController extends Controller
     {
         $shop = Shop::where('subdomain', $domain)->first();
         if (!$shop || !$shop->publish) {
-            return view('404');
+            return view('templates.404');
         }
 
         $products = $shop->products;
