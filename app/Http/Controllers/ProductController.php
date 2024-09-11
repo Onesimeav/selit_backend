@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProductRequest;
+use App\Jobs\UploadAndSaveProductMediaJob;
 use App\Models\Media;
 use App\Models\Product;
 use App\Models\Shop;
@@ -23,18 +24,15 @@ class ProductController extends Controller
             'price'=>$request->input('price'),
             'owner_id'=>Auth::id(),
         ]);
+        $productId=$product->id;
 
         if ($request->input('images')!=null)
         {
             $images=$request->file('images');
+            $mediaType='image';
             //upload images on cloudinary
             foreach ( $images as $item) {
-                $image= $item->storeOnCloudinary('products/images');
-                Media::create([
-                    'url'=>$image->getSecurePath(),
-                    'type'=>'image',
-                    'product_id'=>$product->id,
-                ]);
+                UploadAndSaveProductMediaJob::dispatch($item,$mediaType,$productId);
             }
         }
 
@@ -42,14 +40,11 @@ class ProductController extends Controller
         {
             //upload videos on cloudinary
             $videos= $request->file('videos');
+            $mediaType='videos';
             foreach ($videos as $item) {
-                $video = $item->getRealPath()->storeOnCloudinary('products/videos');
-                Media::create([
-                    'url'=>$video->getSecurePath(),
-                    'type'=>'video',
-                    'product_id'=>$product->id,
-                ]);
+                UploadAndSaveProductMediaJob::dispatch($item,$mediaType,$productId);
             }
+
         }
 
         //store specifications
