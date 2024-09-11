@@ -22,7 +22,7 @@ class ProductController extends Controller
         ]);
 
         $mediaData=[];
-        if ($request->input('images')!=null)
+        if ($request->file('images')!=null)
         {
             $images=$request->file('images');
 
@@ -36,7 +36,7 @@ class ProductController extends Controller
             }
         }
 
-        if ($request->input('videos')!=null)
+        if ($request->file('videos')!=null)
         {
             //upload videos on cloudinary
             $videos= $request->file('videos');
