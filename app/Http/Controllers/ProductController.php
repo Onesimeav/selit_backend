@@ -24,13 +24,13 @@ class ProductController extends Controller
         ]);
 
         $mediaData=[];
-        if ($request->file('images')!=null)
+        if ($request->input('images')!=null)
         {
             $images=$request->file('images');
 
             //upload images on cloudinary
             foreach ( $images as $item) {
-                $image= $item->storeOnCloudinary('products/images');
+                $image= $item->getRealPath()->storeOnCloudinary('products/images');
                 $mediaData[]= [
                     'url'=>$image->getSecurePath(),
                     'type'=>'image',
@@ -38,12 +38,12 @@ class ProductController extends Controller
             }
         }
 
-        if ($request->file('videos')!=null)
+        if ($request->input('videos')!=null)
         {
             //upload videos on cloudinary
             $videos= $request->file('videos');
             foreach ($videos as $item) {
-                $video = $item->storeOnCloudinary('products/videos');
+                $video = $item->getRealPath()->storeOnCloudinary('products/videos');
                 $mediaData[] = [
                     'url'=>$video->getSecuredPath(),
                     'type'=>'video',
