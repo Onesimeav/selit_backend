@@ -110,7 +110,8 @@ class ProductController extends Controller
         }
 
         return response()->json([
-            'message'=>"The user doesn't own this product"
+            'message'=>"The user doesn't own this product",
+            'product'=>$product,
         ],401);
     }
 
@@ -118,7 +119,7 @@ class ProductController extends Controller
     {
         $product_id=$request->input('product_id');
 
-        $product= Product::where('id',$product_id);
+        $product= Product::findOrFail($product_id);
         if ($product->owner_id==Auth::id())
         {
             $product->delete();
