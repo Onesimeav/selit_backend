@@ -62,6 +62,7 @@ class ShopController extends Controller
         if ($shop->owner_id == Auth::id())
         {
             $shop->publish = true;
+            $shop->save();
             return response()->json([
                 'message'=>"Shop published"
             ]);
