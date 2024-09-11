@@ -125,7 +125,7 @@ class ProductController extends Controller
         $product= Product::findOrFail($product_id);
         $medias = $product->medias;
         foreach ($medias as $media) {
-          Cloudinary::destroyAsync($media->public_id);
+          Cloudinary::destroy($media->public_id);
         }
         if ($product->owner_id==Auth::id())
         {
