@@ -3,11 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProductRequest;
+use App\Models\Media;
 use App\Models\Product;
 use App\Models\Shop;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
 class ProductController extends Controller
 {
@@ -32,6 +34,7 @@ class ProductController extends Controller
                 $mediaData[]= [
                     'url'=>$image->getSecurePath(),
                     'type'=>'image',
+                    'public_id'=>$item->getPublicId(),
                 ];
             }
         }
@@ -46,6 +49,7 @@ class ProductController extends Controller
                 $mediaData[] = [
                     'url'=>$video->getSecurePath(),
                     'type'=>'video',
+                    'public_id'=>$item->getPublicId(),
                 ];
             }
 
@@ -111,8 +115,7 @@ class ProductController extends Controller
 
         return response()->json([
             'message'=>"The user doesn't own this product",
-            'product'=>$product,
-        ],401);
+        ],403);
     }
 
     public function deleteProduct(Request $request):JsonResponse
@@ -120,6 +123,10 @@ class ProductController extends Controller
         $product_id=$request->input('product_id');
 
         $product= Product::findOrFail($product_id);
+        $medias = $product->medias;
+        foreach ($medias as $media) {
+          Cloudinary::destroyAsync($media->public_id);
+        }
         if ($product->owner_id==Auth::id())
         {
             $product->delete();
@@ -128,7 +135,7 @@ class ProductController extends Controller
 
         return response()->json([
             'message'=>"The user doesn't this product"
-        ],401);
+        ],403);
     }
 
     public function addToShop(Request $request)
@@ -149,6 +156,6 @@ class ProductController extends Controller
         }
         return response()->json([
             'message'=>"The user doesn't own this shop"
-        ],401);
+        ],403);
     }
 }

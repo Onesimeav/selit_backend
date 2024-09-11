@@ -51,7 +51,7 @@ class ShopController extends Controller
         }
             return response()->json([
                 'message'=>"The user doesn't own this shop"
-            ],401);
+            ],403);
 
     }
 
@@ -69,7 +69,7 @@ class ShopController extends Controller
 
         return response()->json([
             'message'=>"The user doesn't own this shop"
-        ],401);
+        ],403);
     }
 
 }
