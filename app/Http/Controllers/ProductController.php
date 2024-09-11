@@ -34,7 +34,7 @@ class ProductController extends Controller
                 $mediaData[]= [
                     'url'=>$image->getSecurePath(),
                     'type'=>'image',
-                    'public_id'=>$item->getPublicId(),
+                    'public_id'=>$image->getPublicId(),
                 ];
             }
         }
@@ -49,7 +49,7 @@ class ProductController extends Controller
                 $mediaData[] = [
                     'url'=>$video->getSecurePath(),
                     'type'=>'video',
-                    'public_id'=>$item->getPublicId(),
+                    'public_id'=>$video->getPublicId(),
                 ];
             }
 
