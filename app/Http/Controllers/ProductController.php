@@ -24,7 +24,6 @@ class ProductController extends Controller
             'owner_id'=>Auth::id(),
         ]);
 
-        $mediaData=[];
         if ($request->input('images')!=null)
         {
             $images=$request->file('images');
@@ -32,10 +31,11 @@ class ProductController extends Controller
             //upload images on cloudinary
             foreach ( $images as $item) {
                 $image= $item->getRealPath()->storeOnCloudinary();
-                $mediaData[]= [
+                Media::create([
                     'url'=>$image->getSecurePath(),
                     'type'=>'image',
-                ];
+                    'product_id'=>$product->id,
+                ]);
             }
         }
 
@@ -45,18 +45,13 @@ class ProductController extends Controller
             $videos= $request->file('videos');
             foreach ($videos as $item) {
                 $video = $item->getRealPath()->storeOnCloudinary();
-                $mediaData[] = [
+                Media::create([
                     'url'=>$video->getSecurePath(),
                     'type'=>'video',
-                ];
+                    'product_id'=>$product->id,
+                ]);
             }
 
-        }
-
-        if ($mediaData!=[])
-        {
-            //store the medias
-            $product->medias()->createMany($mediaData);
         }
 
         //store specifications
