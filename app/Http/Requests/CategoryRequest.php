@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class TemplateRequest extends FormRequest
+class CategoryRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,7 +23,7 @@ class TemplateRequest extends FormRequest
     {
         return [
             'name'=>'required|string|max:255',
-            'description'=>'required|string',
+            'shop_id'=>'required|integer',
         ];
     }
 }

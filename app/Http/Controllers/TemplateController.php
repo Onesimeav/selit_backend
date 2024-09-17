@@ -36,11 +36,9 @@ class TemplateController extends Controller
         ]);
     }
 
-    public function updateTemplate(TemplateRequest $request): JsonResponse
+    public function updateTemplate(TemplateRequest $request,$id): JsonResponse
     {
-        $template_id=$request->input('template_id');
-
-        $template= Template::findOrFail($template_id);
+        $template= Template::findOrFail($id);
 
         $template->name =$request->input('name');
         $template->description=$request->input('description');
@@ -51,11 +49,9 @@ class TemplateController extends Controller
         ]);
     }
 
-    public function deleteTemplate(Request $request): JsonResponse
+    public function deleteTemplate($id): JsonResponse
     {
-        $template_id=$request->input('template_id');
-
-        Template::where('id', $template_id)->delete();
+        Template::where('id', $id)->delete();
 
         return response()->json([],204);
     }

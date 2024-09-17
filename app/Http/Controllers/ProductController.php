@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\AddToShopRequest;
 use App\Http\Requests\ProductRequest;
+use App\Http\Requests\ProductUpdateRequest;
 use App\Models\Media;
 use App\Models\Product;
 use App\Models\Shop;
@@ -83,79 +85,84 @@ class ProductController extends Controller
         $search = $request->input('search');
 
         if ($search!=null){
-            $product = Product::where('name', 'like', "%$search%")
+            $products = Product::where('name', 'like', "%$search%")
                 ->where('owner_id', Auth::id())
                 ->get();
         }else{
-            $product = Product::where('owner_id', Auth::id())
+            $products = Product::where('owner_id', Auth::id())
                 ->get();
         }
 
         return response()->json([
-            'result'=>$product,
+            'result'=>$products,
         ]);
     }
 
-    public function updateProduct(Request $request):JsonResponse
+    public function updateProduct(ProductUpdateRequest $request, $id):JsonResponse
     {
-        $product_id = $request->input('product_id');
+        $this->isProductOwner($id);
 
-        $product = Product::findOrFail($product_id);
-        if ($product->owner_id==Auth::id())
-        {
-            $product->name=$request->input('name');
-            $product->description=$request->input('description');
-            $product->price=$request->input('price');
-            $product->save();
-
-            return response()->json([
-                'message'=>'Product updated successfully'
-            ]);
-        }
+        $product = Product::findOrFail($id);
+        $product->name=$request->input('name');
+        $product->description=$request->input('description');
+        $product->price=$request->input('price');
+        $product->save();
 
         return response()->json([
-            'message'=>"The user doesn't own this product",
-        ],403);
+            'message'=>'Product updated successfully'
+        ]);
     }
 
-    public function deleteProduct(Request $request):JsonResponse
+    public function deleteProduct($id):JsonResponse
     {
-        $product_id=$request->input('product_id');
-
-        $product= Product::findOrFail($product_id);
+        $this->isProductOwner($id);
+        $product= Product::findOrFail($id);
         $medias = $product->medias;
         foreach ($medias as $media) {
-          Cloudinary::destroy($media->public_id);
-        }
-        if ($product->owner_id==Auth::id())
-        {
-            $product->delete();
-            return response()->json([],204);
+            Cloudinary::destroy($media->public_id);
         }
 
-        return response()->json([
-            'message'=>"The user doesn't this product"
-        ],403);
+        $product->categories()->detach();
+        $product->delete();
+        return response()->json([],204);
     }
 
-    public function addToShop(Request $request)
+    public function isProductOwner($productId): JsonResponse
     {
-        $product_id = $request->input('product_id');
-        $shop_id= $request->input('shop_id');
+        $product= Product::find($productId);
 
-        $product = Product::findOrFail($product_id);
-        $shop = Shop::findOrFail($shop_id);
-        if ($shop->owner_id == Auth::id() && $product->owner_id == Auth::id())
+        if ($product!=null)
         {
-            $product->shop_id=$shop_id;
-            $product->save();
-
-            return response()->json([
-                'message'=>'Product added successfully'
-            ]);
+            if ($product->owner_id!=Auth::id())
+            {
+                return response()->json([
+                    'message'=>'The user does not own this product'
+                ],403);
+            }
         }
         return response()->json([
-            'message'=>"The user doesn't own this shop"
-        ],403);
+            'message'=>'The product does not exist',
+        ],404);
+    }
+
+    public function addToShop(AddToShopRequest $request): JsonResponse
+    {
+        $products_id = $request->input('product_id');
+        $shop_id= $request->input('shop_id');
+
+        ShopController::class->isShopOwner($shop_id);
+
+        foreach ($products_id as $product_id) {
+            $this->isProductOwner($product_id);
+            $product =Product::find($product_id);
+            $product->shop_id=$shop_id;
+            $product->save();
+        }
+
+        return response()->json([
+            'message'=>'Product added successfully'
+        ]);
+
+
     }
 }
