@@ -2,20 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\AddToPromotionRequest;
-use App\Http\Requests\PromotionRequest;
-use App\Http\Requests\PromotionSearchRequest;
-use App\Models\Product;
+use App\Http\Requests\Promotion\AddToPromotionRequest;
+use App\Http\Requests\Promotion\PromotionRequest;
+use App\Http\Requests\Promotion\PromotionSearchRequest;
+use App\Http\Requests\Promotion\PromotionUpdateRequest;
 use App\Models\Promotion;
-use App\Models\Shop;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 class PromotionController extends Controller
 {
     public function createPromotion(PromotionRequest $request): JsonResponse
     {
-        ShopController::class->isShopOwner($request->input('shop_id'));
+        $shopController = new ShopController();
+        $shopController->isShopOwner($request->input('shop_id'));
         $autoApply = $request->input('autoApply');
         if ($autoApply)
         {
@@ -52,18 +51,19 @@ class PromotionController extends Controller
     public function searchPromotion(PromotionSearchRequest $request): JsonResponse
     {
         $shop_id = $request->input('shop_id');
-        ShopController::class->isShopOwner($shop_id);
+        $shopController = new ShopController();
+        $shopController->isShopOwner($shop_id);
 
         $search = $request->input('search');
         if ($search!=null)
         {
             $result = Promotion::where('name','like',"%$search%")
                 ->where('shop',$shop_id)
-                ->get();
+                ->paginate(15);
         }else
         {
             $result = Promotion::where('shop_id',$shop_id)
-                ->get();
+                ->paginate(15);
         }
 
         return response()->json([
@@ -72,15 +72,14 @@ class PromotionController extends Controller
 
     }
 
-    public function updatePromotion(PromotionRequest $request,$id): JsonResponse
+    public function updatePromotion(PromotionUpdateRequest $request,$id): JsonResponse
     {
-        $shop_id=$request->input('shop_id');
-        ShopController::class->isShopOwner($shop_id);
-
         $promotion = Promotion::find($id);
 
         if ($promotion!=null)
         {
+            $shopController = new ShopController();
+            $shopController->isShopOwner($promotion->shop_id);
            $autoApply = $request->input('autoApply');
            if ($autoApply && !$promotion->autoApply)
            {
@@ -121,7 +120,8 @@ class PromotionController extends Controller
         if ($promotion!=null)
         {
             $shop_id = $promotion->shop_id;
-            ShopController::class->isShopOwner($shop_id);
+            $shopController = new ShopController();
+            $shopController->isShopOwner($shop_id);
             $promotion->products()->detach();
             $promotion->delete();
 
@@ -138,7 +138,8 @@ class PromotionController extends Controller
 
         if ($promotion!=null)
         {
-            ShopController::class->isShopOwner($promotion->shop_id);
+            $shopController = new ShopController();
+            $shopController->isShopOwner($promotion->shop_id);
 
             $productsId = $request->input('products');
             foreach ($productsId as $productId) {
@@ -158,7 +159,8 @@ class PromotionController extends Controller
 
         if ($promotion!=null)
         {
-            ShopController::class->isShopOwner($promotion->shop_id);
+            $shopController = new ShopController();
+            $shopController->isShopOwner($promotion->shop_id);
 
             $productsId = $request->input('products');
             foreach ($productsId as $productId) {

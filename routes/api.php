@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\PromotionController;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\TemplateController;
 use App\Http\Controllers\UserAuthenticationController;
@@ -36,9 +37,9 @@ Route::prefix('v1')->middleware(['auth:sanctum','verified'])->group(function () 
     Route::delete('/templates/{id}',[TemplateController::class,'deleteTemplate']);
     //shop
     Route::post('/shops',[ShopController::class,'createShop']);
-    Route::post('choose-shop-template',[ShopController::class,'chooseTemplate']);
-    Route::post('add-product-to-shop',[ProductController::class,'addToShop']);
-    Route::post('publish-shop',[ShopController::class, 'publishShop']);
+    Route::post('/shops/choose-shop-template',[ShopController::class,'chooseTemplate']);
+    Route::post('/shops/add-product-to-shop',[ProductController::class,'addToShop']);
+    Route::get('/shops/publish-shop/{id}',[ShopController::class, 'publishShop']);
     //product
     Route::post('/products',[ProductController::class,'createProduct']);
     Route::get('/products',[ProductController::class,'searchProduct']);
@@ -49,4 +50,15 @@ Route::prefix('v1')->middleware(['auth:sanctum','verified'])->group(function () 
     Route::get('/category',[CategoryController::class,'searchCategory']);
     Route::put('/category/{id}',[CategoryController::class,'updateCategory']);
     Route::delete('/category/{id}',[CategoryController::class,'deleteCategory']);
+    Route::get('/category/get-products/{id}',[CategoryController::class,'getCategoryProducts']);
+    Route::post('/category/add-products',[CategoryController::class,'addProductsToCategory']);
+    Route::post('/category/remove-products',[CategoryController::class,'removeProductsFromCategory']);
+    //promotion
+    Route::post('/promotions',[PromotionController::class,'createPromotion']);
+    Route::get('/promotions',[PromotionController::class,'searchPromotion']);
+    Route::put('/promotions/{id}',[PromotionController::class,'updatePromotion']);
+    Route::delete('/promotions/{id}',[PromotionController::class,'deletePromotion']);
+    Route::post('/promotions/add-products',[PromotionController::class,'addProductsToPromotion']);
+    Route::post('/promotions/remove-products',[PromotionController::class,'removeProductFromPromotion']);
+    Route::get('/promotions/verify-code/{code}',[PromotionController::class,'verifyPromoCode']);
 });

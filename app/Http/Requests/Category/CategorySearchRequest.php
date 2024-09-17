@@ -1,17 +1,17 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Category;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class AddToCategoryRequest extends FormRequest
+class CategorySearchRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,9 +22,8 @@ class AddToCategoryRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'category_id'=>'required|integer',
-            'products'=>'required|array',
-            'products.*'=>'integer',
+            'search'=>'string',
+            'shop_id'=>'required|integer',
         ];
     }
 }

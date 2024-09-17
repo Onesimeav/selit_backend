@@ -1,17 +1,17 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Category;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class PromotionRequest extends FormRequest
+class AddToCategoryRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return true;
+        return false;
     }
 
     /**
@@ -22,12 +22,9 @@ class PromotionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name'=>'required|string|max:255',
-            'autoApply'=>'required|boolean',
-            'duration'=>'required|integer',
-            'value'=>'required|integer',
-            'shop_id'=>'required|integer',
-            'active'=>'boolean',
+            'category_id'=>'required|integer',
+            'products'=>'required|array',
+            'products.*'=>'integer',
         ];
     }
 }

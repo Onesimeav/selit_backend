@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\TemplateRequest;
+use App\Http\Requests\Template\TemplateRequest;
 use App\Models\Template;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -26,9 +26,9 @@ class TemplateController extends Controller
     {
         $search = $request->input('search');
         if ($search!=null){
-            $result = Template::where('name','like',"%$search%")->get();
+            $result = Template::where('name','like',"%$search%")->paginate(15);
         }else{
-            $result = Template::all();
+            $result = Template::all()->paginate(15);
         }
 
         return response()->json([

@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\ShopCreationRequest;
+use App\Http\Requests\Shop\ChooseShopTemplateRequest;
+use App\Http\Requests\Shop\ShopCreationRequest;
 use App\Models\Shop;
 use App\Models\Template;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 
@@ -50,14 +50,16 @@ class ShopController extends Controller
         }
         return response()->json([
             'message'=>'The shop does not exist',
-        ],404);
+        ],403);
     }
 
-    public function chooseTemplate(Request $request): JsonResponse
+    public function chooseTemplate(ChooseShopTemplateRequest $request): JsonResponse
     {
         $template_id = $request->input('template_id');
         $shop_id = $request->input('shop_id');
-        ShopController::class->isShopOwner($shop_id);
+        $shopController = new ShopController();
+        $shopController->isShopOwner($shop_id);
+
         $template = Template::find($template_id);
 
         if ($template!=null)
@@ -78,22 +80,19 @@ class ShopController extends Controller
 
     }
 
-    public function publishShop(Request $request): JsonResponse
+    public function publishShop($id): JsonResponse
     {
-        $shop_id = $request->input('shop_id');
-        $shop = Shop::findOrFail($shop_id);
-        if ($shop->owner_id == Auth::id())
-        {
-            $shop->publish = 'true';
-            $shop->save();
-            return response()->json([
-                'message'=>"Shop published"
-            ]);
-        }
+        $shopController = new ShopController();
+        $shopController->isShopOwner($id);
 
+        $shop = Shop::find($id);
+
+        $shop->publish = 'true';
+        $shop->save();
         return response()->json([
-            'message'=>"The user doesn't own this shop"
-        ],403);
+            'message'=>"Shop published"
+        ]);
     }
+
 
 }

@@ -2,16 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\AddToShopRequest;
-use App\Http\Requests\ProductRequest;
-use App\Http\Requests\ProductUpdateRequest;
-use App\Models\Media;
+use App\Http\Requests\Product\AddToShopRequest;
+use App\Http\Requests\Product\ProductRequest;
+use App\Http\Requests\Product\ProductUpdateRequest;
 use App\Models\Product;
-use App\Models\Shop;
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
 class ProductController extends Controller
 {
@@ -87,10 +85,10 @@ class ProductController extends Controller
         if ($search!=null){
             $products = Product::where('name', 'like', "%$search%")
                 ->where('owner_id', Auth::id())
-                ->get();
+                ->paginate(15);
         }else{
             $products = Product::where('owner_id', Auth::id())
-                ->get();
+                ->paginate(15);
         }
 
         return response()->json([
@@ -150,7 +148,8 @@ class ProductController extends Controller
         $products_id = $request->input('product_id');
         $shop_id= $request->input('shop_id');
 
-        ShopController::class->isShopOwner($shop_id);
+        $shopController = new ShopController();
+        $shopController->isShopOwner($shop_id);
 
         foreach ($products_id as $product_id) {
             $this->isProductOwner($product_id);

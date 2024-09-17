@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Promotion;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class PromotionSearchRequest extends FormRequest
+class PromotionUpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,8 +22,11 @@ class PromotionSearchRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'shop_id'=>'required|integer',
-            'search'=>'string',
+            'name'=>'required|string|max:255',
+            'autoApply'=>'required|boolean',
+            'duration'=>'required|integer',
+            'value'=>'required|integer',
+            'active'=>'boolean',
         ];
     }
 }

@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Product;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class AddToPromotionRequest extends FormRequest
+class AddToShopRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,7 +22,7 @@ class AddToPromotionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'promotion_id'=>'required|integer',
+            'shop_id'=>'required|integer',
             'products'=>'required|array',
             'products.*'=>'integer',
         ];

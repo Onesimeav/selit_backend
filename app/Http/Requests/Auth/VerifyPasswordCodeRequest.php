@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Auth;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class AddToShopRequest extends FormRequest
+class VerifyPasswordCodeRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,9 +22,8 @@ class AddToShopRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'shop_id'=>'required|integer',
-            'products'=>'required|array',
-            'products.*'=>'integer',
+            'code' => 'required|string|exists:reset_code_passwords',
+            'password' => 'required|string|min:6',
         ];
     }
 }

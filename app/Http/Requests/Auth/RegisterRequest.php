@@ -1,11 +1,17 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Auth;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class CategorySearchRequest extends FormRequest
+class RegisterRequest extends FormRequest
 {
+    /**
+     * Indicates if the validator should stop on the first rule failure.
+     *
+     * @var bool
+     */
+    protected $stopOnFirstFailure = true;
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -22,8 +28,9 @@ class CategorySearchRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'search'=>'string',
-            'shop_id'=>'required|integer',
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|lowercase|email|max:255|unique:users',
+            'password' => 'required|min:8',
         ];
     }
 }
