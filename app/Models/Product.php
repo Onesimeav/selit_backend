@@ -48,6 +48,6 @@ class Product extends Model
    public function autoApplyPromotions():BelongsToMany
    {
        return  $this->belongsToMany(Promotion::class)
-                ->where('autoApply',true);
+                ->where('autoApply','true');
    }
 }
