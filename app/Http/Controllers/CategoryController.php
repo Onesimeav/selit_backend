@@ -98,7 +98,7 @@ class CategoryController extends Controller
         {
             $shopController = new ShopController();
             $shopController->isShopOwner($category->shop_id);
-            $products=$category->products();
+            $products=$category->products()->paginate(15);
 
             return response()->json([
                 'products'=>$products,
