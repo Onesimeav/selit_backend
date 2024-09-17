@@ -22,7 +22,6 @@ class CategorySearchRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'search'=>'string',
             'shop_id'=>'required|integer',
         ];
     }

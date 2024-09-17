@@ -22,7 +22,7 @@ Route::prefix('v1')->group(function () {
 //only logged-in users
 Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
     Route::get('resend-verification-code',[UserAuthenticationController::class,'resendVerificationCode']);
-    Route::get('verify-code/{id}',[UserAuthenticationController::class,'verifyCode']);
+    Route::get('verify-code/{code}',[UserAuthenticationController::class,'verifyCode']);
     Route::post('logout', [UserAuthenticationController::class, 'logout']);
 });
 
