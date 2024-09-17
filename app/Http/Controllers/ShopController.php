@@ -51,7 +51,7 @@ class ShopController extends Controller
         }
             return response()->json([
                 'message'=>"The user doesn't own this shop"
-            ],401);
+            ],403);
 
     }
 
@@ -61,7 +61,8 @@ class ShopController extends Controller
         $shop = Shop::findOrFail($shop_id);
         if ($shop->owner_id == Auth::id())
         {
-            $shop->publish = true;
+            $shop->publish = 'true';
+            $shop->save();
             return response()->json([
                 'message'=>"Shop published"
             ]);
@@ -69,7 +70,7 @@ class ShopController extends Controller
 
         return response()->json([
             'message'=>"The user doesn't own this shop"
-        ],401);
+        ],403);
     }
 
 }

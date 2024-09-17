@@ -26,9 +26,9 @@ class ProductRequest extends FormRequest
             'description'=>'required|string',
             'price'=>'required|integer',
             'images' => 'array',
-            'images.*' => 'image|mimes:jpeg,png',
+            'images.*' => 'required|mimes:jpg,png,jpeg|extensions:jpg,png,jpeg',
             'videos' => 'array',
-            'videos.*' => 'file|mimes:mp4,mov',
+            'videos.*' => 'required|mimes:mp4,mov|extensions:mp4,mov',
             'specification'=>'required|array',
             'product_id'=>'integer'
         ];

@@ -6,10 +6,10 @@ use App\Http\Requests\ProductRequest;
 use App\Models\Media;
 use App\Models\Product;
 use App\Models\Shop;
-use App\Models\Specification;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
 class ProductController extends Controller
 {
@@ -23,29 +23,43 @@ class ProductController extends Controller
             'owner_id'=>Auth::id(),
         ]);
 
-        $images=$request->file('images');
         $mediaData=[];
-        //upload images on cloudinary
-        foreach ( $images as $item) {
-            $image= $item->storeOnCloudinary('products/images');
-            $mediaData[]= [
-                'url'=>$image->getSecurePath(),
-                'type'=>'image',
-            ];
+        if ($request->file('images')!=null)
+        {
+            $images=$request->file('images');
+
+            //upload images on cloudinary
+            foreach ( $images as $item) {
+                $image= $item->storeOnCloudinary('products/images');
+                $mediaData[]= [
+                    'url'=>$image->getSecurePath(),
+                    'type'=>'image',
+                    'public_id'=>$image->getPublicId(),
+                ];
+            }
         }
 
-        //upload videos on cloudinary
-        $videos= $request->file('videos');
-        foreach ($videos as $item) {
-           $video = $item->storeOnCloudinary('products/videos');
-            $mediaData[] = [
-                'url'=>$video->getSecuredPath(),
-                'type'=>'video',
-            ];
+        if ($request->file('videos')!=null)
+        {
+            //upload videos on cloudinary
+            $videos= $request->file('videos');
+            foreach ($videos as $item) {
+                $video = $item->storeOnCloudinary('products/videos');
+
+                $mediaData[] = [
+                    'url'=>$video->getSecurePath(),
+                    'type'=>'video',
+                    'public_id'=>$video->getPublicId(),
+                ];
+            }
+
         }
 
-        //store the medias
-        $product->medias()->createMany($mediaData);
+        if ($mediaData!=[])
+        {
+            //store the medias
+            $product->medias()->createMany($mediaData);
+        }
 
         //store specifications
         $specifications=$request->input('specification');
@@ -100,15 +114,19 @@ class ProductController extends Controller
         }
 
         return response()->json([
-            'message'=>"The user doesn't own this product"
-        ],401);
+            'message'=>"The user doesn't own this product",
+        ],403);
     }
 
     public function deleteProduct(Request $request):JsonResponse
     {
         $product_id=$request->input('product_id');
 
-        $product= Product::where('id',$product_id);
+        $product= Product::findOrFail($product_id);
+        $medias = $product->medias;
+        foreach ($medias as $media) {
+          Cloudinary::destroy($media->public_id);
+        }
         if ($product->owner_id==Auth::id())
         {
             $product->delete();
@@ -117,7 +135,7 @@ class ProductController extends Controller
 
         return response()->json([
             'message'=>"The user doesn't this product"
-        ],401);
+        ],403);
     }
 
     public function addToShop(Request $request)
@@ -138,6 +156,6 @@ class ProductController extends Controller
         }
         return response()->json([
             'message'=>"The user doesn't own this shop"
-        ],401);
+        ],403);
     }
 }
