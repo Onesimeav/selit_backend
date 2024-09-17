@@ -131,7 +131,7 @@ class CategoryController extends Controller
             ]);
         }
         return  response()->json([
-            'message'=>'The does not exist',
+            'message'=>'The category does not exist',
         ]);
     }
 

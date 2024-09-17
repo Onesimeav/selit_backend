@@ -34,23 +34,22 @@ class ShopController extends Controller
        ]);
     }
 
-    public function isShopOwner(int $shopId): JsonResponse
+    public function isShopOwner(int $shopId)
     {
-        $shop=Shop::find($shopId);
+        $shop = Shop::find($shopId);
 
-        if ($shop!=null)
-        {
-            if ($shop->owner_id!=Auth::id())
-            {
-                return response()->json([
-                    'message'=>"The user doesn't own this shop"
-                ],403);
-            }
-
+        if (!$shop) {
+            return response()->json([
+                'message' => 'The shop does not exist',
+            ], 404);
         }
-        return response()->json([
-            'message'=>'The shop does not exist',
-        ],403);
+
+        if ($shop->owner_id != Auth::id()) {
+            return response()->json([
+                'message' => "The user doesn't own this shop",
+            ], 403);
+        }
+
     }
 
     public function chooseTemplate(ChooseShopTemplateRequest $request): JsonResponse
