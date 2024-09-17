@@ -7,6 +7,7 @@ use App\Http\Requests\Product\ProductRequest;
 use App\Http\Requests\Product\ProductUpdateRequest;
 use App\Models\Product;
 use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -98,50 +99,65 @@ class ProductController extends Controller
 
     public function updateProduct(ProductUpdateRequest $request, $id):JsonResponse
     {
-        $this->isProductOwner($id);
+        try {
+            $this->isProductOwner($id);
 
-        $product = Product::findOrFail($id);
-        $product->name=$request->input('name');
-        $product->description=$request->input('description');
-        $product->price=$request->input('price');
-        $product->save();
+            $product = Product::findOrFail($id);
+            $product->name=$request->input('name');
+            $product->description=$request->input('description');
+            $product->price=$request->input('price');
+            $product->save();
 
-        return response()->json([
-            'message'=>'Product updated successfully'
-        ]);
+            return response()->json([
+                'message'=>'Product updated successfully'
+            ]);
+        }catch (Exception $e)
+        {
+            return response()->json([
+                'message' => $e->getMessage()
+            ], 403);
+        }
+
     }
 
     public function deleteProduct($id):JsonResponse
     {
-        $this->isProductOwner($id);
-        $product= Product::findOrFail($id);
-        $medias = $product->medias;
-        foreach ($medias as $media) {
-            Cloudinary::destroy($media->public_id);
-        }
-
-        $product->categories()->detach();
-        $product->delete();
-        return response()->json([],204);
-    }
-
-    public function isProductOwner($productId): JsonResponse
-    {
-        $product= Product::find($productId);
-
-        if ($product!=null)
-        {
-            if ($product->owner_id!=Auth::id())
-            {
-                return response()->json([
-                    'message'=>'The user does not own this product'
-                ],403);
+        try {
+            $this->isProductOwner($id);
+            $product= Product::findOrFail($id);
+            $medias = $product->medias;
+            foreach ($medias as $media) {
+                Cloudinary::destroy($media->public_id);
             }
+
+            $product->categories()->detach();
+            $product->delete();
+            return response()->json([],204);
+        }catch (Exception $e)
+        {
+            return response()->json([
+                'message' => $e->getMessage()
+            ], 403);
         }
-        return response()->json([
-            'message'=>'The product does not exist',
-        ],404);
+
     }
+
+    /**
+     * @throws Exception
+     */
+    public function isProductOwner($productId): void
+    {
+        $product = Product::find($productId);
+
+        if ($product !== null) {
+            if ($product->owner_id !== Auth::id()) {
+                throw new Exception("The user does not own this product");
+            }
+        } else {
+            throw new Exception("The product does not exist");
+        }
+    }
+
 
     public function addToShop(AddToShopRequest $request): JsonResponse
     {
@@ -149,19 +165,24 @@ class ProductController extends Controller
         $shop_id= $request->input('shop_id');
 
         $shopController = new ShopController();
-        $shopController->isShopOwner($shop_id);
+        try {
+            $shopController->isShopOwner($shop_id);
 
-        foreach ($products_id as $product_id) {
-            $this->isProductOwner($product_id);
-            $product =Product::find($product_id);
-            $product->shop_id=$shop_id;
-            $product->save();
+            foreach ($products_id as $product_id) {
+                $this->isProductOwner($product_id);
+                $product =Product::find($product_id);
+                $product->shop_id=$shop_id;
+                $product->save();
+            }
+
+            return response()->json([
+                'message'=>'Product added successfully'
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage()
+            ], 403);
         }
-
-        return response()->json([
-            'message'=>'Product added successfully'
-        ]);
-
 
     }
 }

@@ -6,6 +6,7 @@ use App\Http\Requests\Shop\ChooseShopTemplateRequest;
 use App\Http\Requests\Shop\ShopCreationRequest;
 use App\Models\Shop;
 use App\Models\Template;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 
@@ -34,63 +35,75 @@ class ShopController extends Controller
        ]);
     }
 
-    public function isShopOwner(int $shopId)
+    /**
+     * @throws Exception
+     */
+    public function isShopOwner(int $shopId): void
     {
         $shop = Shop::find($shopId);
 
-        if (!$shop) {
-            return response()->json([
-                'message' => 'The shop does not exist',
-            ], 404);
+        if ($shop !== null) {
+            if ($shop->owner_id !== Auth::id()) {
+                throw new Exception("The user doesn't own this shop");
+            }
+        } else {
+            throw new Exception("The shop does not exist");
         }
-
-        if ($shop->owner_id != Auth::id()) {
-            return response()->json([
-                'message' => "The user doesn't own this shop",
-            ], 403);
-        }
-
     }
+
 
     public function chooseTemplate(ChooseShopTemplateRequest $request): JsonResponse
     {
         $template_id = $request->input('template_id');
         $shop_id = $request->input('shop_id');
         $shopController = new ShopController();
-        $shopController->isShopOwner($shop_id);
 
-        $template = Template::find($template_id);
+        try {
+            $shopController->isShopOwner($shop_id);
 
-        if ($template!=null)
-        {
-            $shop= Shop::findOrFail($shop_id);
-            $shop->template_id=$template_id;
-            $shop->save();
+            // If we reach here, the user owns the shop
+            $template = Template::find($template_id);
 
+            if ($template !== null) {
+                $shop = Shop::findOrFail($shop_id);
+                $shop->template_id = $template_id;
+                $shop->save();
+
+                return response()->json([
+                    'message' => 'Template added successfully',
+                    'shop_id' => $shop->id,
+                ]);
+            } else {
+                return response()->json([
+                    'message' => 'The template does not exist'
+                ], 403);
+            }
+        } catch (Exception $e) {
             return response()->json([
-                'message'=>'Template added successfully',
-                'shop_id'=>$shop->id,
-            ]);
+                'message' => $e->getMessage()
+            ], 403);
         }
-
-        return response()->json([
-            'message'=>'The template does not exist'
-        ],403);
-
     }
+
 
     public function publishShop($id): JsonResponse
     {
         $shopController = new ShopController();
-        $shopController->isShopOwner($id);
+        try {
+            $shopController->isShopOwner($id);
 
-        $shop = Shop::find($id);
+            $shop = Shop::find($id);
 
-        $shop->publish = 'true';
-        $shop->save();
-        return response()->json([
-            'message'=>"Shop published"
-        ]);
+            $shop->publish = 'true';
+            $shop->save();
+            return response()->json([
+                'message'=>"Shop published"
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage()
+            ], 403);
+        }
     }
 
 

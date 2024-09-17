@@ -8,6 +8,7 @@ use App\Http\Requests\Category\CategorySearchRequest;
 use App\Http\Requests\Category\CategoryUpdateRequest;
 use App\Models\Category;
 use App\Models\Shop;
+use Exception;
 use Illuminate\Http\JsonResponse;
 
 class CategoryController extends Controller
@@ -16,17 +17,23 @@ class CategoryController extends Controller
     {
         $shop_id = $request->input('shop_id');
         $shopController = new ShopController();
-        $shopController->isShopOwner($shop_id);
-        $shop= Shop::find($shop_id);
+        try {
+            $shopController->isShopOwner($shop_id);
+            $shop= Shop::find($shop_id);
 
-        $category=Category::create([
-            'name'=>$request->input('name'),
-            'shop_id'=>$shop->id,
-        ]);
-        return response()->json([
-            'message'=>'Category created successfully',
-            'category_id'=>$category->id,
-        ],201);
+            $category=Category::create([
+                'name'=>$request->input('name'),
+                'shop_id'=>$shop->id,
+            ]);
+            return response()->json([
+                'message'=>'Category created successfully',
+                'category_id'=>$category->id,
+            ],201);
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage()
+            ], 403);
+        }
     }
 
     public function searchCategory(CategorySearchRequest $request):JsonResponse
@@ -35,21 +42,27 @@ class CategoryController extends Controller
         $search= $request->input('search');
 
         $shopController = new ShopController();
-        $shopController->isShopOwner($shop_id);
-        if ($search!=null)
-        {
-            $category=Category::where('name','like',"%$search%")
-                ->where('shop_id',$shop_id)
-                ->paginate(15);
+        try {
+            $shopController->isShopOwner($shop_id);
+            if ($search!=null)
+            {
+                $category=Category::where('name','like',"%$search%")
+                    ->where('shop_id',$shop_id)
+                    ->paginate(15);
 
-        }else{
-            $category=Category::where('shop_id',$shop_id)
-                ->paginate(15);
+            }else{
+                $category=Category::where('shop_id',$shop_id)
+                    ->paginate(15);
+            }
+
+            return response()->json([
+                'result'=>$category
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage()
+            ], 403);
         }
-
-        return response()->json([
-            'result'=>$category
-        ]);
     }
 
     public function updateCategory(CategoryUpdateRequest $request,$id): JsonResponse
@@ -59,13 +72,19 @@ class CategoryController extends Controller
         {
             $shop_id=$category->shop_id;
             $shopController = new ShopController();
-            $shopController->isShopOwner($shop_id);
-            $category->name=$request->input('name');
-            $category->save();
-            return response()->json([
-                'message'=>'Category updated successfully',
-                'category_id'=>$category->id,
-            ]);
+            try {
+                $shopController->isShopOwner($shop_id);
+                $category->name=$request->input('name');
+                $category->save();
+                return response()->json([
+                    'message'=>'Category updated successfully',
+                    'category_id'=>$category->id,
+                ]);
+            } catch (Exception $e) {
+                return response()->json([
+                    'message' => $e->getMessage()
+                ], 403);
+            }
         }
 
         return response()->json([
@@ -80,10 +99,16 @@ class CategoryController extends Controller
         {
             $shop_id=$category->shop_id;
             $shopController = new ShopController();
-            $shopController->isShopOwner($shop_id);
-            $category->products()->detach();
-            $category->delete();
-            return response()->json([],204);
+            try {
+                $shopController->isShopOwner($shop_id);
+                $category->products()->detach();
+                $category->delete();
+                return response()->json([],204);
+            } catch (Exception $e) {
+                return response()->json([
+                    'message' => $e->getMessage()
+                ], 403);
+            }
         }
         return response()->json([
             'message'=>'The category does not exist'
@@ -97,12 +122,18 @@ class CategoryController extends Controller
         if ($category!=null)
         {
             $shopController = new ShopController();
-            $shopController->isShopOwner($category->shop_id);
-            $products=$category->products()->paginate(15);
+            try {
+                $shopController->isShopOwner($category->shop_id);
+                $products=$category->products()->paginate(15);
 
-            return response()->json([
-                'products'=>$products,
-            ]);
+                return response()->json([
+                    'products'=>$products,
+                ]);
+            } catch (Exception $e) {
+                return response()->json([
+                    'message' => $e->getMessage()
+                ], 403);
+            }
         }
 
         return response()->json([
@@ -113,27 +144,32 @@ class CategoryController extends Controller
     public function addProductsToCategory(AddToCategoryRequest $request): JsonResponse
     {
         $category = Category::find($request->input('category_id'));
-        if ($category!=null)
-        {
+        if ($category !== null) {
             $shopController = new ShopController();
             $productController = new ProductController();
-            $shopController->isShopOwner($category->shop_id);
+            try {
+                $shopController->isShopOwner($category->shop_id);
 
-            $productsId = $request->input('products');
-            foreach ($productsId as $productId) {
+                $productsId = $request->input('products');
+                foreach ($productsId as $productId) {
+                    $productController->isProductOwner($productId);
+                }
+                $category->products()->attach($productsId);
 
-                $productController->isProductOwner($productId);
+                return response()->json([
+                    'message' => 'Products added successfully'
+                ]);
+            } catch (\Exception $e) {
+                return response()->json([
+                    'message' => $e->getMessage()
+                ], 403);
             }
-            $category->products()->attach($productsId);
-
-            return response()->json([
-                'message'=>'Products added successfully'
-            ]);
         }
-        return  response()->json([
-            'message'=>'The category does not exist',
+        return response()->json([
+            'message' => 'The category does not exist',
         ]);
     }
+
 
     public function removeProductsFromCategory(AddToCategoryRequest $request): JsonResponse
     {
@@ -142,18 +178,23 @@ class CategoryController extends Controller
         {
             $shopController = new ShopController();
             $productController = new ProductController();
-            $shopController->isShopOwner($category->shop_id);
+            try {
+                $shopController->isShopOwner($category->shop_id);
 
-            $productsId = $request->input('products');
-            foreach ($productsId as $productId) {
+                $productsId = $request->input('products');
+                foreach ($productsId as $productId) {
+                    $productController->isProductOwner($productId);
+                }
+                $category->products()->detach($productsId);
 
-                $productController->isProductOwner($productId);
+                return response()->json([
+                    'message'=>'Products successfully removed form the category',
+                ]);
+            } catch (Exception $e) {
+                return response()->json([
+                    'message' => $e->getMessage()
+                ], 403);
             }
-            $category->products()->detach($productsId);
-
-            return response()->json([
-                'message'=>'Products successfully removed form the category',
-            ]);
         }
         return response()->json([
             'message'=>'The category does not exist',
