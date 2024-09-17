@@ -86,9 +86,8 @@ class UserAuthenticationController extends Controller
         ],200);
     }
 
-    public function verifyCode(Request $request): JsonResponse
+    public function verifyCode($code): JsonResponse
     {
-        $code = $request->input('code');
         $verify=VerificationCode::verify($code,auth()->user()->email);
 
         if($verify){
