@@ -7,8 +7,10 @@ use App\Http\Requests\Promotion\PromotionRequest;
 use App\Http\Requests\Promotion\PromotionSearchRequest;
 use App\Http\Requests\Promotion\PromotionUpdateRequest;
 use App\Models\Promotion;
+use Carbon\Traits\ToStringFormat;
 use Exception;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Str;
 
 class PromotionController extends Controller
 {
@@ -28,7 +30,7 @@ class PromotionController extends Controller
                     'shop_id'=>$request->input('shop_id'),
                 ]);
             }else{
-                $code = fake()->regexify('[A-Z0-9]{8}');
+                $code = Str::upper(Str::random(6)).rand(10,99);
                 $promotion=Promotion::create([
                     'name'=>$request->input('name'),
                     'code'=>$code,
@@ -104,7 +106,7 @@ class PromotionController extends Controller
                     $promotion->autoApply='true';
                 }elseif (!$autoApply && $promotion->autoApply)
                 {
-                    $code = fake()->regexify('[A-Z0-9]{8}');
+                    $code = Str::upper(Str::random(6)).rand(10,99);
                     $promotion->code=$code;
                     $promotion->name=$request->input('name');
                     $promotion->value=$request->input('value');
