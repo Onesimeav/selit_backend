@@ -7,7 +7,6 @@ use App\Http\Requests\Promotion\PromotionRequest;
 use App\Http\Requests\Promotion\PromotionSearchRequest;
 use App\Http\Requests\Promotion\PromotionUpdateRequest;
 use App\Models\Promotion;
-use Carbon\Traits\ToStringFormat;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Str;
@@ -68,7 +67,7 @@ class PromotionController extends Controller
             if ($search!=null)
             {
                 $result = Promotion::where('name','like',"%$search%")
-                    ->where('shop',$shop_id)
+                    ->where('shop_id',$shop_id)
                     ->paginate(15);
             }else
             {

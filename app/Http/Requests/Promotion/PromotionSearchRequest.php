@@ -23,7 +23,6 @@ class PromotionSearchRequest extends FormRequest
     {
         return [
             'shop_id'=>'required|integer',
-            'search'=>'string',
         ];
     }
 }
