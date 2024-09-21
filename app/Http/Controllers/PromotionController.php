@@ -117,6 +117,11 @@ class PromotionController extends Controller
                     $promotion->value=$request->input('value');
                     $promotion->duration=$request->input('duration');
                 }
+                $active=$request->input('active');
+                if ($active)
+                {
+                    $promotion->active='true';
+                }
                 $promotion->save();
 
                 return response()->json([
