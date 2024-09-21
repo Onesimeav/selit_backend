@@ -173,10 +173,10 @@ class PromotionController extends Controller
             $shopController = new ShopController();
             try {
                 $shopController->isShopOwner($promotion->shop_id);
-
+                $productController = new ProductController();
                 $productsId = $request->input('products');
                 foreach ($productsId as $productId) {
-                    ProductController::class->isProductOwner($productId);
+                    $productController->isProductOwner($productId);
                 }
                 $promotion->products()->attach($productsId);
 
@@ -202,12 +202,13 @@ class PromotionController extends Controller
         if ($promotion!=null)
         {
             $shopController = new ShopController();
+            $productController = new ProductController();
             try {
                 $shopController->isShopOwner($promotion->shop_id);
 
                 $productsId = $request->input('products');
                 foreach ($productsId as $productId) {
-                    ProductController::class->isProductOwner($productId);
+                    $productController->isProductOwner($productId);
                 }
                 $promotion->products()->detach($productsId);
                  return response()->json([
