@@ -43,6 +43,7 @@ class PromotionController extends Controller
             if ($active)
             {
                 $promotion->active='true';
+                $promotion->save();
             }
 
             return response()->json([
