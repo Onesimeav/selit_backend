@@ -6,6 +6,7 @@ use App\Http\Requests\Shop\ChooseShopTemplateRequest;
 use App\Http\Requests\Shop\ShopCreationRequest;
 use App\Models\Shop;
 use App\Models\Template;
+use App\Services\ShopOwnershipService;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
@@ -35,32 +36,14 @@ class ShopController extends Controller
        ]);
     }
 
-    /**
-     * @throws Exception
-     */
-    public function isShopOwner(int $shopId): void
-    {
-        $shop = Shop::find($shopId);
-
-        if ($shop !== null) {
-            if ($shop->owner_id !== Auth::id()) {
-                throw new Exception("The user doesn't own this shop");
-            }
-        } else {
-            throw new Exception("The shop does not exist");
-        }
-    }
-
-
-    public function chooseTemplate(ChooseShopTemplateRequest $request): JsonResponse
+    public function chooseTemplate(ChooseShopTemplateRequest $request, ShopOwnershipService $shopOwnershipService): JsonResponse
     {
         $template_id = $request->input('template_id');
         $shop_id = $request->input('shop_id');
         $shopController = new ShopController();
 
-        try {
-            $shopController->isShopOwner($shop_id);
-
+        if ($shopOwnershipService->isShopOwner($shop_id))
+        {
             // If we reach here, the user owns the shop
             $template = Template::find($template_id);
 
@@ -78,20 +61,15 @@ class ShopController extends Controller
                     'message' => 'The template does not exist'
                 ], 403);
             }
-        } catch (Exception $e) {
-            return response()->json([
-                'message' => $e->getMessage()
-            ], 403);
         }
+        return response()->json([],403);
     }
 
 
-    public function publishShop($id): JsonResponse
+    public function publishShop(ShopOwnershipService $shopOwnershipService,$id): JsonResponse
     {
-        $shopController = new ShopController();
-        try {
-            $shopController->isShopOwner($id);
-
+        if ($shopOwnershipService->isShopOwner($id))
+        {
             $shop = Shop::find($id);
 
             $shop->publish = 'true';
@@ -99,11 +77,8 @@ class ShopController extends Controller
             return response()->json([
                 'message'=>"Shop published"
             ]);
-        } catch (Exception $e) {
-            return response()->json([
-                'message' => $e->getMessage()
-            ], 403);
         }
+        return response()->json([],403);
     }
 
 

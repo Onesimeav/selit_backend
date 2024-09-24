@@ -22,11 +22,11 @@ class SubdomainController extends Controller
         $template_name = $template->name;
         if (!$shop->publish){
             if ($shop->owner_id==Auth::id()){
-                return view("templates.{$template_name}.preview", ['shop' => $shop, 'products' => $products]);
+                return view("templates.{$template_name}.preview", compact($shop,$products));
             }
             return view('templates.404');
         }
-        return view("templates.{$template_name}.index", ['shop' => $shop, 'products' => $products]);
+        return view("templates.{$template_name}.index", compact($shop,$products));
 
     }
 

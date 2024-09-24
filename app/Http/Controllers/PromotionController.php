@@ -7,17 +7,18 @@ use App\Http\Requests\Promotion\PromotionRequest;
 use App\Http\Requests\Promotion\PromotionSearchRequest;
 use App\Http\Requests\Promotion\PromotionUpdateRequest;
 use App\Models\Promotion;
+use App\Services\ProductOwnershipService;
+use App\Services\ShopOwnershipService;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Str;
 
 class PromotionController extends Controller
 {
-    public function createPromotion(PromotionRequest $request): JsonResponse
+    public function createPromotion(PromotionRequest $request,ShopOwnershipService $shopOwnershipService): JsonResponse
     {
-        $shopController = new ShopController();
-        try {
-            $shopController->isShopOwner($request->input('shop_id'));
+        if ($shopOwnershipService->isShopOwner($request->input('shop_id')))
+        {
             $autoApply = $request->input('autoApply');
             if ($autoApply)
             {
@@ -50,20 +51,15 @@ class PromotionController extends Controller
                 'message'=>'Promotion created successfully',
                 'promotion_id'=>$promotion->id,
             ],201);
-        } catch (Exception $e) {
-            return response()->json([
-                'message' => $e->getMessage()
-            ], 403);
         }
+        return response()->json([],403);
     }
 
-    public function searchPromotion(PromotionSearchRequest $request): JsonResponse
+    public function searchPromotion(PromotionSearchRequest $request, ShopOwnershipService $shopOwnershipService): JsonResponse
     {
         $shop_id = $request->input('shop_id');
-        $shopController = new ShopController();
-        try {
-            $shopController->isShopOwner($shop_id);
-
+        if ($shopOwnershipService->isShopOwner($shop_id))
+        {
             $search = $request->input('search');
             if ($search!=null)
             {
@@ -80,22 +76,18 @@ class PromotionController extends Controller
                 'result'=>$result,
             ]);
 
-        } catch (Exception $e) {
-            return response()->json([
-                'message' => $e->getMessage()
-            ], 403);
         }
+        return response()->json([],403);
     }
 
-    public function updatePromotion(PromotionUpdateRequest $request,$id): JsonResponse
+    public function updatePromotion(PromotionUpdateRequest $request,ShopOwnershipService $shopOwnershipService,$id): JsonResponse
     {
         $promotion = Promotion::find($id);
 
         if ($promotion!=null)
         {
-            $shopController = new ShopController();
-            try {
-                $shopController->isShopOwner($promotion->shop_id);
+            if ($shopOwnershipService->isShopOwner($promotion->shop_id))
+            {
                 $autoApply = $request->input('autoApply');
                 if ($autoApply && !$promotion->autoApply)
                 {
@@ -128,11 +120,8 @@ class PromotionController extends Controller
                     'message'=>'Promotion successfully updated',
                     'promotion_id'=>$promotion->id,
                 ]);
-            } catch (Exception $e) {
-                return response()->json([
-                    'message' => $e->getMessage()
-                ], 403);
             }
+            return response()->json([],403);
         }
 
         return response()->json([
@@ -140,54 +129,49 @@ class PromotionController extends Controller
         ],404);
     }
 
-    public function deletePromotion($id): JsonResponse
+    public function deletePromotion(ShopOwnershipService $shopOwnershipService,$id): JsonResponse
     {
         $promotion = Promotion::find($id);
         if ($promotion!=null)
         {
             $shop_id = $promotion->shop_id;
-            $shopController = new ShopController();
-            try {
-                $shopController->isShopOwner($shop_id);
+            if ($shopOwnershipService->isShopOwner($shop_id))
+            {
                 $promotion->products()->detach();
                 $promotion->delete();
 
                 return response()->json([],204);
-            } catch (Exception $e) {
-                return response()->json([
-                    'message' => $e->getMessage()
-                ], 403);
             }
+            return response()->json([],403);
         }
         return response()->json([
             'message'=>'The promotion does not exist'
         ],404);
     }
 
-    public function addProductsToPromotion(AddToPromotionRequest $request): JsonResponse
+    public function addProductsToPromotion(AddToPromotionRequest $request,ShopOwnershipService $shopOwnershipService, ProductOwnershipService $productOwnershipService): JsonResponse
     {
         $promotion = Promotion::find($request->input('promotion_id'));
 
         if ($promotion!=null)
         {
-            $shopController = new ShopController();
-            try {
-                $shopController->isShopOwner($promotion->shop_id);
+            if ($shopOwnershipService->isShopOwner($promotion->shop_id))
+            {
                 $productController = new ProductController();
                 $productsId = $request->input('products');
                 foreach ($productsId as $productId) {
-                    $productController->isProductOwner($productId);
+                    if (!$productOwnershipService->isProductOwner($productId))
+                    {
+                        return response()->json([],403);
+                    }
                 }
                 $promotion->products()->attach($productsId);
 
                 return response()->json([
                     'message'=>'Products added successfully'
                 ]);
-            } catch (Exception $e) {
-                return response()->json([
-                    'message' => $e->getMessage()
-                ], 403);
             }
+            return response()->json([],403);
         }
 
         return response()->json([
@@ -195,30 +179,27 @@ class PromotionController extends Controller
         ],404);
     }
 
-    public function removeProductFromPromotion(AddToPromotionRequest $request): JsonResponse
+    public function removeProductFromPromotion(AddToPromotionRequest $request,ProductOwnershipService $productOwnershipService, ShopOwnershipService $shopOwnershipService): JsonResponse
     {
         $promotion = Promotion::find($request->input('promotion_id'));
 
         if ($promotion!=null)
         {
-            $shopController = new ShopController();
-            $productController = new ProductController();
-            try {
-                $shopController->isShopOwner($promotion->shop_id);
-
+            if ($shopOwnershipService->isShopOwner($promotion->shop_id))
+            {
                 $productsId = $request->input('products');
                 foreach ($productsId as $productId) {
-                    $productController->isProductOwner($productId);
+                    if (!$productOwnershipService->isProductOwner($productId))
+                    {
+                        return response()->json([],403);
+                    }
                 }
                 $promotion->products()->detach($productsId);
                  return response()->json([
                      'message'=>'Products removed successfully'
                  ]);
-            } catch (Exception $e) {
-                return response()->json([
-                    'message' => $e->getMessage()
-                ], 403);
             }
+            return response()->json([],403);
         }
 
         return response()->json([
@@ -248,7 +229,7 @@ class PromotionController extends Controller
 
         return response()->json([
             'message'=>'The promotion does not exist'
-        ]);
+        ],404);
     }
 
 }
