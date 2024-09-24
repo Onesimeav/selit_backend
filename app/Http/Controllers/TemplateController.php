@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\TemplateRequest;
+use App\Http\Requests\Template\TemplateRequest;
 use App\Models\Template;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -26,9 +26,9 @@ class TemplateController extends Controller
     {
         $search = $request->input('search');
         if ($search!=null){
-            $result = Template::where('name','like',"%$search%")->get();
+            $result = Template::where('name','like',"%$search%")->paginate(15);
         }else{
-            $result = Template::all();
+            $result = Template::all()->paginate(15);
         }
 
         return response()->json([
@@ -36,11 +36,9 @@ class TemplateController extends Controller
         ]);
     }
 
-    public function updateTemplate(TemplateRequest $request): JsonResponse
+    public function updateTemplate(TemplateRequest $request,$id): JsonResponse
     {
-        $template_id=$request->input('template_id');
-
-        $template= Template::findOrFail($template_id);
+        $template= Template::findOrFail($id);
 
         $template->name =$request->input('name');
         $template->description=$request->input('description');
@@ -51,11 +49,9 @@ class TemplateController extends Controller
         ]);
     }
 
-    public function deleteTemplate(Request $request): JsonResponse
+    public function deleteTemplate($id): JsonResponse
     {
-        $template_id=$request->input('template_id');
-
-        Template::where('id', $template_id)->delete();
+        Template::where('id', $id)->delete();
 
         return response()->json([],204);
     }

@@ -2,17 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\ForgotPasswordRequest;
-use App\Http\Requests\LoginRequest;
-use App\Http\Requests\RegisterRequest;
-use App\Http\Requests\VerifyPasswordCodeRequest;
+use App\Http\Requests\Auth\ForgotPasswordRequest;
+use App\Http\Requests\Auth\LoginRequest;
+use App\Http\Requests\Auth\RegisterRequest;
+use App\Http\Requests\Auth\VerifyPasswordCodeRequest;
 use App\Mail\SendCodeResetPassword;
 use App\Models\ResetCodePassword;
 use App\Models\User;
-use Exception;
 use GuzzleHttp\Exception\ClientException;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
@@ -87,9 +85,8 @@ class UserAuthenticationController extends Controller
         ],200);
     }
 
-    public function verifyCode(Request $request): JsonResponse
+    public function verifyCode($code): JsonResponse
     {
-        $code = $request->input('code');
         $verify=VerificationCode::verify($code,auth()->user()->email);
 
         if($verify){
@@ -168,7 +165,7 @@ class UserAuthenticationController extends Controller
     }
 
 
-    public function verifyPasswordCode(VerifyPasswordCodeRequest $request)
+    public function verifyPasswordCode(VerifyPasswordCodeRequest $request): JsonResponse
     {
         // find the code
         $passwordReset = ResetCodePassword::firstWhere('code', $request->code);

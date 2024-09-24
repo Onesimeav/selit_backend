@@ -1,18 +1,11 @@
 <?php
 
-namespace App\Http\Requests\Auth;
+namespace App\Http\Requests\Shop;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class LoginRequest extends FormRequest
+class ChooseShopTemplateRequest extends FormRequest
 {
-    /**
-     * Indicates if the validator should stop on the first rule failure.
-     *
-     * @var bool
-     */
-    protected $stopOnFirstFailure = true;
-
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -29,8 +22,8 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => 'required|string|lowercase|email|max:255',
-            'password' => 'required|min:8',
+            'shop_id'=>'required|integer',
+            'template_id'=>'required|integer'
         ];
     }
 }
