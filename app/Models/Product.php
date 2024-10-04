@@ -50,4 +50,9 @@ class Product extends Model
        return  $this->belongsToMany(Promotion::class)
                 ->where('autoApply','true');
    }
+
+   public function orders(): BelongsToMany
+   {
+       return $this->belongsToMany(Order::class)->using(OrderProduct::class);
+   }
 }

@@ -106,6 +106,7 @@ class ProductController extends Controller
             $product = Product::findOrFail($id);
             $product->name=$request->input('name');
             $product->description=$request->input('description');
+            $product->type=$request->input('product_type');
             $product->price=$request->input('price');
             $product->save();
 

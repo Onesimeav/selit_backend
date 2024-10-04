@@ -1,27 +1,35 @@
 <?php
 
-namespace App\Mail;
+namespace App\Mail\Seller;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Address;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Mail\Mailables\Address;
 
-class TestMail extends Mailable
+class SendNewOrderMail extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
-
-    public $data;
 
     /**
      * Create a new message instance.
      */
-    public function __construct( $data )
+    public string $shopName;
+
+    public string $shopOwnerName;
+
+    public string $order_reference;
+    public array $orderProducts;
+
+    public function __construct($shopName,$shopOwnerName,$order_reference,$orderProducts)
     {
-        $this->data = $data;
+     $this->shopName=$shopName;
+     $this->shopOwnerName=$shopOwnerName;
+     $this->order_reference=$order_reference;
+     $this->orderProducts=$orderProducts;
     }
 
     /**
@@ -30,8 +38,8 @@ class TestMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Test Mail',
-            from: new Address('test@mail.dev', 'Test Mail'),
+            from: new Address('test@mail.dev', 'Selit'),
+            subject: 'New Order',
         );
     }
 
@@ -41,7 +49,7 @@ class TestMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'mail.test-mail',
+            view: 'mail.seller.new-order',
         );
     }
 

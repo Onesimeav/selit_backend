@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Requests\Product;
+namespace App\Http\Requests\Order;
 
-use App\Enums\ProductTypeEnum;
+use App\Enums\OrderStatusEnum;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class ProductUpdateRequest extends FormRequest
+class OrderRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,9 +24,14 @@ class ProductUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'shop_id'=>'required|integer',
             'name'=>'required|string|max:255',
-            'description'=>'required|string',
-            'price'=>'required|integer',
+            'surname'=>'required|string|max:255',
+            'email' => 'required|string|lowercase|email|max:255',
+            'number'=>'required|integer',
+            'products.*.product_id' => 'required|integer',
+            'products.*.quantity' => 'required|integer',
+            'products.*.promotion_id' => 'nullable|integer',
         ];
     }
 }

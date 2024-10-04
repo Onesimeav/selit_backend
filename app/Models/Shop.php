@@ -31,4 +31,9 @@ class Shop extends Model
     {
         return $this->hasMany(Category::class);
     }
+
+    public function orders():HasMany
+    {
+        return $this->hasMany(Order::class);
+    }
 }

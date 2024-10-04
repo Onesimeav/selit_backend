@@ -1,27 +1,28 @@
 <?php
 
-namespace App\Mail;
+namespace App\Mail\DeliveryMan;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Address;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Mail\Mailables\Address;
 
-class TestMail extends Mailable
+class SendOrderDeliveryMail extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
-
-    public $data;
 
     /**
      * Create a new message instance.
      */
-    public function __construct( $data )
+
+    public string $deliveryLink;
+
+    public function __construct($deliveryLink)
     {
-        $this->data = $data;
+        $this->deliveryLink=$deliveryLink;
     }
 
     /**
@@ -30,8 +31,8 @@ class TestMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Test Mail',
-            from: new Address('test@mail.dev', 'Test Mail'),
+            from: new Address('test@mail.dev', 'Selit'),
+            subject: 'Order Delivery Notification',
         );
     }
 
@@ -41,7 +42,7 @@ class TestMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'mail.test-mail',
+            view: 'view.delivery.order-delivery',
         );
     }
 

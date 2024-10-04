@@ -30,8 +30,8 @@ class SendCodeResetPassword extends Mailable implements ShouldQueue
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Password Reset Code',
             from: new Address('test@mail.dev', 'Selit'),
+            subject: 'Password Reset Code',
         );
     }
 
@@ -41,7 +41,7 @@ class SendCodeResetPassword extends Mailable implements ShouldQueue
     public function content(): Content
     {
         return new Content(
-            view: 'password-reset',
+            view: 'mail.password-reset',
         );
     }
 

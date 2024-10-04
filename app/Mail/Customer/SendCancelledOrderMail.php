@@ -1,27 +1,31 @@
 <?php
 
-namespace App\Mail;
+namespace App\Mail\Customer;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Address;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Mail\Mailables\Address;
 
-class TestMail extends Mailable
+class SendCancelledOrderMail extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
-
-    public $data;
 
     /**
      * Create a new message instance.
      */
-    public function __construct( $data )
+
+    public string $shopName;
+    public string $customerName;
+    public string $orderReference;
+    public function __construct($shopName,$customerName,$orderReference)
     {
-        $this->data = $data;
+        $this->shopName=$shopName;
+        $this->customerName=$customerName;
+        $this->orderReference=$orderReference;
     }
 
     /**
@@ -30,8 +34,8 @@ class TestMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Test Mail',
-            from: new Address('test@mail.dev', 'Test Mail'),
+            from: new Address('test@mail.dev', 'Selit'),
+            subject: 'Order Cancellation Notification',
         );
     }
 
@@ -41,7 +45,7 @@ class TestMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'mail.test-mail',
+            view: 'mail.customer.order-canceled',
         );
     }
 

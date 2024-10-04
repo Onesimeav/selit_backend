@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PromotionController;
 use App\Http\Controllers\ShopController;
@@ -17,6 +18,7 @@ Route::prefix('v1')->group(function () {
     Route::get('/google-auth-callback',[UserAuthenticationController::class, 'handleGoogleAuthCallback']);
     Route::post('/forgot-password',[UserAuthenticationController::class,'forgotPassword']);
     Route::post('/reset-password',[UserAuthenticationController::class,'verifyPasswordCode']);
+    Route::post('/verify-transaction',[OrderController::class,'verifyOrderTransaction']);
 });
 
 //only logged-in users
