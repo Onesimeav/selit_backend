@@ -38,6 +38,7 @@ class SendNewOrderMail extends Mailable implements ShouldQueue
     public function envelope(): Envelope
     {
         return new Envelope(
+            from: new Address('test@mail.dev', 'Selit'),
             subject: 'New Order',
         );
     }
