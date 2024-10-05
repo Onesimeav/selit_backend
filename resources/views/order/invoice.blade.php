@@ -27,7 +27,7 @@
             </td>
             <td class="w-half">
                 <div><h4>From:</h4></div>
-                <div>{{$ShopName}}</div>
+                <div>{{$shopName}}</div>
             </td>
         </tr>
     </table>
