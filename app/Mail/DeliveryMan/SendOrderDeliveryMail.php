@@ -42,7 +42,7 @@ class SendOrderDeliveryMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'view.delivery.order-delivery',
+            view: 'mail.delivery.order-delivery',
         );
     }
 
