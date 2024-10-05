@@ -113,13 +113,13 @@ class OrderController extends Controller
             $order->status=OrderStatusEnum::APPROVED;
             $order->save();
 
-            $shopName = Shop::where('id',$order->shop_id)->name->get();
+            $shop = Shop::findOrFail($order->shop_id);
             $orderProducts=$order->products()->get()->toArray();
             $orderProductsData=[];
             foreach ($orderProducts as $orderProduct) {
                 $orderProductsData[]=$orderProduct['pivot'];
             }
-            Mail::to($order->email)->send(new \App\Mail\Customer\SendApprovedOrderMail($shopName,"$order->name $order->surname",$order->order_reference,$orderProductsData));
+            Mail::to($order->email)->send(new \App\Mail\Customer\SendApprovedOrderMail($shop->name,"$order->name $order->surname",$order->order_reference,$orderProductsData));
 
             return response()->json([
                 'message'=>'Order successfully approved'
@@ -140,13 +140,13 @@ class OrderController extends Controller
             $order->save();
 
             $deliveryLink = "https://www.selit.store/order/delivery/$order->order_reference";
-            $shopName = Shop::where('id',$order->shop_id)->name->get();
+            $shop = Shop::findOrFail($order->shop_id);
             $orderProducts=$order->products()->get()->toArray();
             $orderProductsData=[];
             foreach ($orderProducts as $orderProduct) {
                 $orderProductsData[]=$orderProduct['pivot'];
             }
-            Mail::to($order->email)->send(new \App\Mail\Customer\SendOrderDeliveryMail($shopName,"$order->name $order->surname",$order->order_reference,$orderProductsData));
+            Mail::to($order->email)->send(new \App\Mail\Customer\SendOrderDeliveryMail($shop->name,"$order->name $order->surname",$order->order_reference,$orderProductsData));
             Mail::to($request->input('deliveryman_email'))->send(new \App\Mail\DeliveryMan\SendOrderDeliveryMail($deliveryLink));
             return response()->json([
                 'message'=>'Order state successfully set as delivery',
