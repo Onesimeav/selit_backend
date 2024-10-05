@@ -19,7 +19,11 @@ Route::prefix('v1')->group(function () {
     Route::get('/google-auth-callback',[UserAuthenticationController::class, 'handleGoogleAuthCallback']);
     Route::post('/forgot-password',[UserAuthenticationController::class,'forgotPassword']);
     Route::post('/reset-password',[UserAuthenticationController::class,'verifyPasswordCode']);
-    Route::post('/verify-transaction',[OrderController::class,'verifyOrderTransaction']);
+    //orders
+    Route::post('/orders',[OrderController::class,'createOrder']);
+    Route::put('/orders/finish-order',[OrderController::class,'setOrderStateAsFinished']);
+    Route::put('/orders/cancel-order',[OrderController::class,'cancelOrder']);
+    Route::put('orders/delivered-order/{orderReference}',[OrderController::class,'setOrderStateAsDelivered']);
 });
 
 //only logged-in users
@@ -69,11 +73,7 @@ Route::prefix('v1')->middleware(['auth:sanctum','verified'])->group(function () 
     Route::post('/promotions/remove-products',[PromotionController::class,'removeProductFromPromotion']);
     Route::get('/promotions/verify-code/{code}',[PromotionController::class,'verifyPromoCode']);
     //order
-    Route::post('/orders',[OrderController::class,'createOrder']);
     Route::get('/orders',[OrderController::class,'getOrders']);
     Route::put('/orders/approve-order/{orderId}',[OrderController::class,'setOrderStateAsApproved']);
     Route::put('/orders/delivery-order',[OrderController::class,'setOrderStateAsDelivery']);
-    Route::put('orders/delivered-order/{orderReference}',[OrderController::class,'setOrderStateAsDelivered']);
-    Route::put('/orders/finish-order',[OrderController::class,'setOrderStateAsFinished']);
-    Route::put('/orders/cancel-order',[OrderController::class,'cancelOrder']);
 });
