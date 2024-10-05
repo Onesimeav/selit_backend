@@ -174,7 +174,7 @@ class OrderController extends Controller
 
     public function setOrderStateAsDelivered($orderReference): JsonResponse
     {
-        $order = Order::where('order_reference',$orderReference)->get();
+        $order = Order::where('order_reference',$orderReference)->first();
 
         if ($order!=null)
         {
@@ -204,7 +204,7 @@ class OrderController extends Controller
 
     public function setOrderStateAsFinished(VerifyOrderTransactionRequest $request): JsonResponse
     {
-        $order = Order::where('order_reference',$request->input('order_reference'))->get();
+        $order = Order::where('order_reference',$request->input('order_reference'))->first();
 
         if ($order!=null)
         {
@@ -263,7 +263,7 @@ class OrderController extends Controller
 
     public function cancelOrder(ShopOwnershipService $shopOwnershipService,$orderReference): JsonResponse
     {
-        $order = Order::where('order_reference',$orderReference)->get();
+        $order = Order::where('order_reference',$orderReference)->first();
 
         if ($order!=null)
         {
