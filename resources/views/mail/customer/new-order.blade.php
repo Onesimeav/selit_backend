@@ -11,7 +11,7 @@ Your order will be approved soo, by the seller</p>
 <h2>Order Details:</h2>
 <ul>
     <li>
-        <strong>Order reference:</strong> {{ $order_reference }}
+        <strong>Order reference:</strong> {{ $orderReference }}
     </li>
     @if(count($orderProducts) > 0)
         @foreach($orderProducts as $orderProduct)

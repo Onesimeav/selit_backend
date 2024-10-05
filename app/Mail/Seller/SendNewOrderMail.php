@@ -21,14 +21,14 @@ class SendNewOrderMail extends Mailable implements ShouldQueue
 
     public string $shopOwnerName;
 
-    public string $order_reference;
+    public string $orderReference;
     public array $orderProducts;
 
-    public function __construct($shopName,$shopOwnerName,$order_reference,$orderProducts)
+    public function __construct($shopName,$shopOwnerName,$orderReference,$orderProducts)
     {
      $this->shopName=$shopName;
      $this->shopOwnerName=$shopOwnerName;
-     $this->order_reference=$order_reference;
+     $this->orderReference=$orderReference;
      $this->orderProducts=$orderProducts;
     }
 

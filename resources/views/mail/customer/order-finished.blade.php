@@ -10,7 +10,7 @@
 <p>Below, you'll find the details of your order:</p>
 <ul>
     <li>
-        <strong>Order reference:</strong> {{ $order_reference }}
+        <strong>Order reference:</strong> {{ $orderReference }}
     </li>
     @if(count($orderProducts) > 0)
         @foreach($orderProducts as $orderProduct)
