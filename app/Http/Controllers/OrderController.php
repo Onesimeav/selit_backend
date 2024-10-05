@@ -114,8 +114,12 @@ class OrderController extends Controller
             $order->save();
 
             $shopName = Shop::where('id',$order->shop_id)->name->get();
-            $orderProducts = $order->products()->get()->toArray();
-            Mail::to($order->email)->send(new \App\Mail\Customer\SendApprovedOrderMail($shopName,"$order->name $order->surname",$order->order_reference,$orderProducts));
+            $orderProducts=$order->products()->get()->toArray();
+            $orderProductsData=[];
+            foreach ($orderProducts as $orderProduct) {
+                $orderProductsData[]=$orderProduct['pivot'];
+            }
+            Mail::to($order->email)->send(new \App\Mail\Customer\SendApprovedOrderMail($shopName,"$order->name $order->surname",$order->order_reference,$orderProductsData));
 
             return response()->json([
                 'message'=>'Order successfully approved'
@@ -137,8 +141,12 @@ class OrderController extends Controller
 
             $deliveryLink = "https://www.selit.store/order/delivery/$order->order_reference";
             $shopName = Shop::where('id',$order->shop_id)->name->get();
-            $orderProducts = $order->products()->get()->toArray();
-            Mail::to($order->email)->send(new \App\Mail\Customer\SendOrderDeliveryMail($shopName,"$order->name $order->surname",$order->order_reference,$orderProducts));
+            $orderProducts=$order->products()->get()->toArray();
+            $orderProductsData=[];
+            foreach ($orderProducts as $orderProduct) {
+                $orderProductsData[]=$orderProduct['pivot'];
+            }
+            Mail::to($order->email)->send(new \App\Mail\Customer\SendOrderDeliveryMail($shopName,"$order->name $order->surname",$order->order_reference,$orderProductsData));
             Mail::to($request->input('deliveryman_email'))->send(new \App\Mail\DeliveryMan\SendOrderDeliveryMail($deliveryLink));
             return response()->json([
                 'message'=>'Order state successfully set as delivery',
@@ -176,7 +184,11 @@ class OrderController extends Controller
             $shop = Shop::findOrFail($order->shop_id);
             $shopOwner = User::findOrFail($shop->owner_id);
             $orderProducts=$order->products()->get()->toArray();
-            Mail::to($order->email)->send(new \App\Mail\Customer\SendOrderDeliveredMail($shop->name,"$order->name $order->surname",$orderReference,$orderProducts));
+            $orderProductsData=[];
+            foreach ($orderProducts as $orderProduct) {
+                $orderProductsData[]=$orderProduct['pivot'];
+            }
+            Mail::to($order->email)->send(new \App\Mail\Customer\SendOrderDeliveredMail($shop->name,"$order->name $order->surname",$orderReference,$orderProductsData));
             Mail::to($shopOwner->email)->send(new \App\Mail\Seller\SendOrderDeliveredMail($shop->name,$shopOwner->name,$orderReference,$orderProducts));
 
             return response()->json([
@@ -206,7 +218,7 @@ class OrderController extends Controller
             $orderPrice =0;
             $orderProducts=$order->products()->get();
             foreach ($orderProducts as $orderProduct) {
-                $orderPrice+= ($orderProduct->price_promotion_applied*$orderProduct->product_quantity);
+                $orderPrice+= ($orderProduct->pivot->price_promotion_applied*$orderProduct->pivot->product_quantity);
             }
             if ($result->status=="SUCCESS"&& $result->amount==$orderPrice)
             {
@@ -219,15 +231,20 @@ class OrderController extends Controller
                 //update order state
                 $order->status=OrderStatusEnum::FINISHED;
 
+                $orderProducts=$order->products()->get()->toArray();
+                $orderProductsData=[];
+                foreach ($orderProducts as $orderProduct) {
+                    $orderProductsData[]=$orderProduct['pivot'];
+                }
                 //generate order invoice
-                $pdf = Pdf::loadView('pdf', ['customerName'=>"$order->name $order->surname", 'shopName'=>$shop->name, 'orderProducts'=>$orderProducts->toArray(), 'orderPrice'=>$orderPrice]);
+                $pdf = Pdf::loadView('pdf', ['customerName'=>"$order->name $order->surname", 'shopName'=>$shop->name, 'orderProducts'=>$orderProductsData, 'orderPrice'=>$orderPrice]);
                 //upload on cloudinary
                 $invoice = $pdf->storeOnCloudinary('invoices');
                 $order->invoice = $invoice->getSecurePath();
                 $order->save();
 
-                Mail::to($order->email)->send(new \App\Mail\Customer\SendFinishedOrderMail($shop->name,"$order->name $order->surname",$order->order_reference,$orderProducts->toArray(),$order->invoice));
-                Mail::to($user->email)->send(new \App\Mail\Seller\SendFinishedOrderMail($shop->name,$user->name,$order->order_reference,$orderProducts->toArray()));
+                Mail::to($order->email)->send(new \App\Mail\Customer\SendFinishedOrderMail($shop->name,"$order->name $order->surname",$order->order_reference,$orderProductsData,$order->invoice));
+                Mail::to($user->email)->send(new \App\Mail\Seller\SendFinishedOrderMail($shop->name,$user->name,$order->order_reference,$orderProductsData));
 
                 return response()->json([
                     'message'=>'The order was successfully verified'
@@ -254,7 +271,8 @@ class OrderController extends Controller
             {
                 $order->status=OrderStatusEnum::CANCELED;
                 $order->save();
-
+                $shop=Shop::findOrFail($order->shop_id);
+                Mail::to($order->email)->send(new \App\Mail\Customer\SendCancelledOrderMail($shop->name,"$order->name $order->surname",$orderReference));
                 return response()->json([
                     'message'=>'Order cancelled successfully',
                 ]);
@@ -263,7 +281,9 @@ class OrderController extends Controller
                 {
                     $order->status=OrderStatusEnum::CANCELED;
                     $order->save();
-
+                    $shop=Shop::findOrFail($order->shop_id);
+                    $user = User::findOrFail($shop->owner_id);
+                    Mail::to($user->email)->send(new \App\Mail\Seller\SendCancelledOrderMail($user->name,$orderReference));
                     return response()->json([
                         'message'=>'Order cancelled successfully',
                     ]);
