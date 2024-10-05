@@ -189,7 +189,7 @@ class OrderController extends Controller
                 $orderProductsData[]=$orderProduct['pivot'];
             }
             Mail::to($order->email)->send(new \App\Mail\Customer\SendOrderDeliveredMail($shop->name,"$order->name $order->surname",$orderReference,$orderProductsData));
-            Mail::to($shopOwner->email)->send(new \App\Mail\Seller\SendOrderDeliveredMail($shop->name,$shopOwner->name,$orderReference,$orderProducts));
+            Mail::to($shopOwner->email)->send(new \App\Mail\Seller\SendOrderDeliveredMail($shop->name,$shopOwner->name,$orderReference,$orderProductsData));
 
             return response()->json([
                 'message'=>'Order state set as delivered successfully'
