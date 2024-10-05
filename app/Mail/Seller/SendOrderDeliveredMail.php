@@ -46,7 +46,7 @@ class SendOrderDeliveredMail extends Mailable implements ShouldQueue
     public function content(): Content
     {
         return new Content(
-            view: 'view.mail.seller.order-delivered',
+            view: 'mail.seller.order-delivered',
         );
     }
 
