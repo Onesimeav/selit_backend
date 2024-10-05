@@ -55,7 +55,8 @@ class UserController extends Controller
 
     public function getWithdrawalRequests(): JsonResponse
     {
-        $withdrawal=Withdrawal::all()->paginate(15);
+        $withdrawal= Withdrawal::paginate(15);
+
 
         return response()->json([
             'result'=>$withdrawal,

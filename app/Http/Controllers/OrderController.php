@@ -278,9 +278,8 @@ class OrderController extends Controller
                 return response()->json([
                     'message'=>'Order cancelled successfully',
                 ]);
-            }else{
-                if ($order->status ==OrderStatusEnum::PENDING || $order->status==OrderStatusEnum::APPROVED)
-                {
+            }elseif($order->status ==OrderStatusEnum::PENDING || $order->status==OrderStatusEnum::APPROVED)
+            {
                     $order->status=OrderStatusEnum::CANCELED;
                     $order->save();
                     $shop=Shop::findOrFail($order->shop_id);
@@ -289,7 +288,6 @@ class OrderController extends Controller
                     return response()->json([
                         'message'=>'Order cancelled successfully',
                     ]);
-                }
             }
 
             return response()->json([
