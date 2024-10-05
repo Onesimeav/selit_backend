@@ -35,7 +35,6 @@ class SendOrderDeliveredMail extends Mailable implements ShouldQueue
     public function envelope(): Envelope
     {
         return new Envelope(
-            from: new Address('test@mail.dev', 'Selit'),
             subject: 'Order Delivered Notification',
         );
     }
