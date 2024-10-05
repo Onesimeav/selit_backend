@@ -240,8 +240,9 @@ class OrderController extends Controller
                 //generate order invoice
                 $pdf = Pdf::loadView('order.invoice', ['customerName'=>"$order->name $order->surname", 'shopName'=>$shop->name, 'orderProducts'=>$orderProductsData, 'orderPrice'=>$orderPrice, 'orderReference'=>$request->input('order_reference')]);
                 //upload on cloudinary
-                $invoice = $pdf->stream($request->input('order_reference').'.pdf')->storeOnCloudinary('invoices');
-                $order->invoice = $invoice->getSecurePath();
+                $invoice = $pdf->download($request->input('order_reference').'.pdf');
+                $savedInvoice = $invoice->storeOnCloudinary('invoices');
+                $order->invoice = $savedInvoice->getSecurePath();
                 $order->save();
 
                 Mail::to($order->email)->send(new \App\Mail\Customer\SendFinishedOrderMail($shop->name,"$order->name $order->surname",$order->order_reference,$orderProductsData,$order->invoice));
