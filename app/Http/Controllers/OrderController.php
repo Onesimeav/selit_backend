@@ -38,7 +38,6 @@ class OrderController extends Controller
         ]);
 
         $orderProducts=$request->input('products');
-        $orderProductsData=[];
         foreach ($orderProducts as $orderProduct) {
             $product_id=$orderProduct['product_id'];
             $product=Product::findOrFail($product_id);
@@ -47,7 +46,7 @@ class OrderController extends Controller
                 $promotion_id=$orderProduct['promotion_id'];
                 $promotion=Promotion::findOrFail($promotion_id);
 
-                $orderProductsData[]=[
+                OrderProduct::create([
                     'order_id'=>$order->id,
                     'product_id'=>$product->id,
                     'product_name'=>$product->name,
@@ -56,21 +55,20 @@ class OrderController extends Controller
                     'promotion_id'=>$promotion_id,
                     'promotion_code'=>$promotion->code,
                     'price_promotion_applied'=>($product->price*$promotion->value)/100,
-                ];
+                ]);
             }else{
-                $orderProductsData[]=[
+                OrderProduct::create([
                     'order_id'=>$order->id,
                     'product_id'=>$product->id,
                     'product_name'=>$product->name,
                     'product_price'=>$product->price,
                     'product_quantity'=>$orderProduct['quantity'],
                     'price_promotion_applied'=>$product->price,
-                ];
+                ]);
             }
         }
 
-        OrderProduct::createMany($orderProductsData);
-
+        $orderProductsData=$order->products()->get()->toArray();
         $shopOwner = User::findOrFail($shop->owner_id);
         Mail::to($shopOwner->email)->send(new \App\Mail\Seller\SendNewOrderMail($shop->name,$shopOwner->name,$order->order_reference,$orderProductsData));
         Mail::to($order->email)->send(new \App\Mail\Customer\SendNewOrderMail($shop->name,"$order->name $order->surname",$order->order_reference,$orderProductsData));
