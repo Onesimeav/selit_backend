@@ -22,14 +22,24 @@ class UserController extends Controller
 
     public function makeWithdrawal(MakeWithdrawalRequest $request): JsonResponse
     {
-        Withdrawal::create([
-            'amount'=>$request->input('amount'),
-            'user_id'=>Auth::id(),
-        ]);
+        $user=User::findOrFail(Auth::id());
+        if ($user->balance>=$request->input('amount'))
+        {
+            Withdrawal::create([
+                'amount'=>$request->input('amount'),
+                'user_id'=>Auth::id(),
+            ]);
+            $user->balance = $user->balance-$request->input('amount');
+
+            return response()->json([
+                'message'=>'Withdrawal request successfully created'
+            ]);
+        }
 
         return response()->json([
-            'message'=>'Withdrawal request successfully created'
+            'message'=>'The user does not have enough money'
         ]);
+
     }
 
     public function validateWithdrawal($id): JsonResponse

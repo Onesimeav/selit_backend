@@ -22,7 +22,7 @@ Route::prefix('v1')->group(function () {
     //orders
     Route::post('/orders',[OrderController::class,'createOrder']);
     Route::put('/orders/finish-order',[OrderController::class,'setOrderStateAsFinished']);
-    Route::put('/orders/cancel-order',[OrderController::class,'cancelOrder']);
+    Route::put('/orders/cancel-order/{orderReference}',[OrderController::class,'cancelOrder']);
     Route::put('orders/delivered-order/{orderReference}',[OrderController::class,'setOrderStateAsDelivered']);
 });
 
