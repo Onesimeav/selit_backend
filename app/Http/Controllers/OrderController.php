@@ -69,6 +69,7 @@ class OrderController extends Controller
         }
 
         $orderProductsData=$order->products()->get()->toArray();
+        var_dump($orderProductsData);
         $shopOwner = User::findOrFail($shop->owner_id);
         Mail::to($shopOwner->email)->send(new \App\Mail\Seller\SendNewOrderMail($shop->name,$shopOwner->name,$order->order_reference,$orderProductsData));
         Mail::to($order->email)->send(new \App\Mail\Customer\SendNewOrderMail($shop->name,"$order->name $order->surname",$order->order_reference,$orderProductsData));
