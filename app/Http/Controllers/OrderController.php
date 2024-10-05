@@ -73,7 +73,6 @@ class OrderController extends Controller
         foreach ($orderProducts as $orderProduct) {
             $orderProductsData[]=$orderProduct['pivot'];
         }
-        dd($orderProductsData);
         $shopOwner = User::findOrFail($shop->owner_id);
         Mail::to($shopOwner->email)->send(new \App\Mail\Seller\SendNewOrderMail($shop->name,$shopOwner->name,$order->order_reference,$orderProductsData));
         Mail::to($order->email)->send(new \App\Mail\Customer\SendNewOrderMail($shop->name,"$order->name $order->surname",$order->order_reference,$orderProductsData));
