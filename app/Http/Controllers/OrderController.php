@@ -174,7 +174,7 @@ class OrderController extends Controller
 
     public function setOrderStateAsDelivered($orderReference): JsonResponse
     {
-        $order = Order::wehre('order_reference',$orderReference)->get();
+        $order = Order::where('order_reference',$orderReference)->get();
 
         if ($order!=null)
         {
