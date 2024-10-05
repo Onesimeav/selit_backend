@@ -9,7 +9,6 @@ use App\Models\Product;
 use App\Services\ProductOwnershipService;
 use App\Services\ShopOwnershipService;
 use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
-use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;

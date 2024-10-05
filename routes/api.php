@@ -8,6 +8,7 @@ use App\Http\Controllers\ShopController;
 use App\Http\Controllers\TemplateController;
 use App\Http\Controllers\UserAuthenticationController;
 use App\Http\Controllers\MailController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
@@ -30,7 +31,11 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
 
 //Only for verified users
 Route::prefix('v1')->middleware(['auth:sanctum','verified'])->group(function () {
-
+    //users
+    Route::get('/users/get-balance',[UserController::class,'getBalance']);
+    Route::post('/users/withdraw-request',[UserController::class,'makeWithdrawal']);
+    Route::get('/users/get-withdraw-request',[UserController::class,'getWithdrawalRequests']);
+    Route::put('/users/validate-withdraw/{id}',[UserController::class,'validateWithdrawal']);
     Route::get('test-route',[UserAuthenticationController::class,'testRoute']);
     //template
     Route::post('/templates',[TemplateController::class,'createTemplate']);
@@ -63,4 +68,12 @@ Route::prefix('v1')->middleware(['auth:sanctum','verified'])->group(function () 
     Route::post('/promotions/add-products',[PromotionController::class,'addProductsToPromotion']);
     Route::post('/promotions/remove-products',[PromotionController::class,'removeProductFromPromotion']);
     Route::get('/promotions/verify-code/{code}',[PromotionController::class,'verifyPromoCode']);
+    //order
+    Route::post('/orders',[OrderController::class,'createOrder']);
+    Route::get('/orders',[OrderController::class,'getOrders']);
+    Route::put('/orders/approve-order/{orderId}',[OrderController::class,'setOrderStateAsApproved']);
+    Route::put('/orders/delivery-order',[OrderController::class,'setOrderStateAsDelivery']);
+    Route::put('orders/delivered-order/{orderReference}',[OrderController::class,'setOrderStateAsDelivered']);
+    Route::put('/orders/finish-order',[OrderController::class,'setOrderStateAsFinished']);
+    Route::put('/orders/cancel-order',[OrderController::class,'cancelOrder']);
 });

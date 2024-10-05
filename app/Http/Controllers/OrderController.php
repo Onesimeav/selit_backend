@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Enums\OrderStatusEnum;
 use App\Http\Requests\Order\OrderRequest;
-use App\Http\Requests\Order\setOrderStateAsApprovedRequest;
+use App\Http\Requests\Order\OrderSearchRequest;
 use App\Http\Requests\Order\setOrderStateAsDeliveryRequest;
 use App\Http\Requests\Order\VerifyOrderTransactionRequest;
 use App\Models\Order;
@@ -16,7 +16,6 @@ use App\Models\User;
 use App\Services\ShopOwnershipService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Kkiapay\Kkiapay;
@@ -80,9 +79,33 @@ class OrderController extends Controller
         ],201);
     }
 
-    public function setOrderStateAsApproved(ShopOwnershipService $shopOwnershipService, setOrderStateAsApprovedRequest $request): JsonResponse
+    public function getOrders(ShopOwnershipService $shopOwnershipService,OrderSearchRequest $request): JsonResponse
     {
-        $order=Order::findOrFail($request->input('order_id'));
+        if ($shopOwnershipService->isShopOwner($request->input('shop_id')))
+        {
+            if ($request->input('status')!=null)
+            {
+                $result = Order::where('shop_id',$request->input('shop_id'))
+                        ->where('status',$request->input('status'))
+                        ->paginate(15);
+
+            }else
+            {
+                $result = Order::where('shop_id',$request->input('shop_id'))->paginate(15);
+
+            }
+            return response()->json([
+                'result'=>$result,
+            ]);
+        }
+
+        return response()->json([
+            'message'=>'The user does not own this shop'
+        ],403);
+    }
+    public function setOrderStateAsApproved(ShopOwnershipService $shopOwnershipService, $orderId): JsonResponse
+    {
+        $order=Order::findOrFail($orderId);
         if ($shopOwnershipService->isShopOwner($order->shop_id))
         {
             $order->status=OrderStatusEnum::APPROVED;
