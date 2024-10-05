@@ -9,5 +9,5 @@ Route::group(['domain' => '{subdomain}.selit.store'], function () {
     Route::get('/', [SubdomainController::class,'index']);
 });
 
-Route::get('/delivery/{orderReference}',[OrderController::class,'getDeliveryDetails']);
+Route::get('order/delivery/{orderReference}',[OrderController::class,'getDeliveryDetails']);
 
