@@ -166,7 +166,7 @@ class OrderController extends Controller
         if ($order!=null)
         {
             $orderData = $order->toArray();
-            return view('delivery.delivery-details', compact($orderData));
+            return view('delivery.delivery-details', compact('orderData'));
         }
 
         return view('template.404');
