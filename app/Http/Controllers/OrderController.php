@@ -71,7 +71,7 @@ class OrderController extends Controller
         $orderProducts=$order->products()->get()->toArray();
         $orderProductsData=[];
         foreach ($orderProducts as $orderProduct) {
-            $orderProductsData[]=$orderProduct->pivot;
+            $orderProductsData[]=$orderProduct['pivot'];
         }
         dd($orderProductsData);
         $shopOwner = User::findOrFail($shop->owner_id);
