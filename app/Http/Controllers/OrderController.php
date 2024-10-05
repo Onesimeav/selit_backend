@@ -236,10 +236,11 @@ class OrderController extends Controller
                 foreach ($orderProducts as $orderProduct) {
                     $orderProductsData[]=$orderProduct['pivot'];
                 }
+
                 //generate order invoice
                 $pdf = Pdf::loadView('order.invoice', ['customerName'=>"$order->name $order->surname", 'shopName'=>$shop->name, 'orderProducts'=>$orderProductsData, 'orderPrice'=>$orderPrice, 'orderReference'=>$request->input('order_reference')]);
                 //upload on cloudinary
-                $invoice = $pdf->storeOnCloudinary('invoices');
+                $invoice = $pdf->stream($request->input('order_reference').'.pdf')->storeOnCloudinary('invoices');
                 $order->invoice = $invoice->getSecurePath();
                 $order->save();
 
