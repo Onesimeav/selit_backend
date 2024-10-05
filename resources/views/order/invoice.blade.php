@@ -43,7 +43,7 @@
             <th>Promo-price</th>
         </tr>
         <tr class="items">
-            @foreach($order_products as $order_product)
+            @foreach($orderProducts as $orderProduct)
                 <td>
                     {{ $orderProduct['product_quantity'] }}
                 </td>
