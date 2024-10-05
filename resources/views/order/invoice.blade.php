@@ -13,7 +13,7 @@
             <img src="https://res.cloudinary.com/dklf43wgz/image/upload/c_crop,w_250,h_125,g_auto/v1728038876/7_wiz6tu.png" alt="selit logo" width="200" />
         </td>
         <td class="w-half">
-            <h2>Invoice ID: {{$order_reference}}</h2>
+            <h2>Invoice ID: {{$orderReference}}</h2>
         </td>
     </tr>
 </table>
