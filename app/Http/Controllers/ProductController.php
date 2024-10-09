@@ -113,11 +113,13 @@ class ProductController extends Controller
                 'message'=>'Product updated successfully'
             ]);
         }
-        return response()->json([],403);
+        return response()->json([
+            'message'=>'The user does not own this product'
+        ],403);
 
     }
 
-    public function deleteProduct(ProductOwnershipService $productOwnershipService,$id):JsonResponse
+    public function deleteProduct(ProductOwnershipService $productOwnershipService,$id)
     {
         if ($productOwnershipService->isProductOwner($id))
         {
@@ -129,9 +131,11 @@ class ProductController extends Controller
 
             $product->categories()->detach();
             $product->delete();
-            return response()->json([],204);
+            return response()->noContent(204);
         }
-        return response()->json([],403);
+        return response()->json([
+            'message'=>'The user does not own this product'
+        ],403);
     }
 
 
@@ -146,7 +150,9 @@ class ProductController extends Controller
             foreach ($products as $product) {
                 if (!$productOwnershipService->isProductOwner($product->id))
                 {
-                    return response()->json([],403);
+                    return response()->json([
+                        'message'=>'The user does not own this product'
+                    ],403);
                 }
                 $product->shop_id=$shopId;
             }
@@ -156,6 +162,8 @@ class ProductController extends Controller
                 'message'=>'Product added successfully'
             ]);
         }
-        return response()->json([],403);
+        return response()->json([
+            'message'=>'The user does not own this product'
+        ],403);
     }
 }

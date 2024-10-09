@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Shop\ChangeShopMainColorRequest;
 use App\Http\Requests\Shop\ChooseShopTemplateRequest;
 use App\Http\Requests\Shop\ShopCreationRequest;
+use App\Models\Order;
 use App\Models\Shop;
 use App\Models\Template;
 use App\Services\ShopOwnershipService;
@@ -47,9 +49,13 @@ class ShopController extends Controller
             // If we reach here, the user owns the shop
             $template = Template::find($template_id);
 
-            if ($template !== null) {
+            if ($template != null) {
                 $shop = Shop::findOrFail($shop_id);
                 $shop->template_id = $template_id;
+                if ($request->filled('main_color'))
+                {
+                    $shop->main_color=$request->input('main_color');
+                }
                 $shop->save();
 
                 return response()->json([
@@ -63,6 +69,24 @@ class ShopController extends Controller
             }
         }
         return response()->json([],403);
+    }
+
+    public function changeShopMainColor(ShopOwnershipService $shopOwnershipService,ChangeShopMainColorRequest $request): JsonResponse
+    {
+        if ($shopOwnershipService->isShopOwner($request->input('shop_id')))
+        {
+            $shop=Shop::findOrFail($request->input('shop_id'));
+            $shop->main_color=$request->input('main_color');
+            $shop->save();
+
+            return response()->json([
+                'message'=>'Shop main color successfully changed',
+            ]);
+        }
+
+        return response()->json([
+            'message'=>'The user does not own the shop',
+        ],403);
     }
 
 

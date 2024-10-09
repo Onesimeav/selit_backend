@@ -22,7 +22,7 @@ class UserController extends Controller
 
     public function makeWithdrawal(MakeWithdrawalRequest $request): JsonResponse
     {
-        $user=User::findOrFail(Auth::id());
+        $user=$request->user();
         if ($user->balance>=$request->input('amount'))
         {
             Withdrawal::create([
@@ -45,7 +45,7 @@ class UserController extends Controller
     public function validateWithdrawal($id): JsonResponse
     {
         $withdrawal=Withdrawal::findOrFail($id);
-        $withdrawal->status='true';
+        $withdrawal->status=true;
         $withdrawal->save();
 
         return response()->json([

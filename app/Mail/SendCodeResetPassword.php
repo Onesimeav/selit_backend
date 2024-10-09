@@ -17,11 +17,9 @@ class SendCodeResetPassword extends Mailable implements ShouldQueue
     /**
      * Create a new message instance.
      */
-    public $code;
-
-    public function __construct($code)
+    public function __construct(public  $code)
     {
-        $this->code = $code;
+
     }
 
     /**

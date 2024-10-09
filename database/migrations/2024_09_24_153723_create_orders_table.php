@@ -20,7 +20,6 @@ return new class extends Migration
             $table->bigInteger('number');
             $table->string('location');
             $table->string('status');
-            $table->string('invoice')->nullable();
             $table->unsignedBigInteger('shop_id');
             $table->foreign('shop_id')->references('id')->on('shops')->onUpdate('cascade')->onDelete('cascade');
             $table->timestamps();

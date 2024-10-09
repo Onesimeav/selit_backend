@@ -18,14 +18,9 @@ class SendCancelledOrderMail extends Mailable implements ShouldQueue
      * Create a new message instance.
      */
 
-    public string $shopName;
-    public string $customerName;
-    public string $orderReference;
-    public function __construct($shopName,$customerName,$orderReference)
+    public function __construct(public string $shopName, public string $customerName, public string $orderReference)
     {
-        $this->shopName=$shopName;
-        $this->customerName=$customerName;
-        $this->orderReference=$orderReference;
+
     }
 
     /**

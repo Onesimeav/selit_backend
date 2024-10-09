@@ -9,10 +9,6 @@ class ProductOwnershipService
 {
     public function isProductOwner($productId): bool
     {
-        if (Product::where('id', $productId)->where('owner_id', Auth::id())->exists())
-        {
-            return true;
-        }
-        return false;
+        return Product::where('id', $productId)->where('owner_id', Auth::id())->exists();
     }
 }

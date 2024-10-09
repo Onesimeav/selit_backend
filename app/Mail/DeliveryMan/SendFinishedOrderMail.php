@@ -17,10 +17,9 @@ class SendFinishedOrderMail extends Mailable implements ShouldQueue
     /**
      * Create a new message instance.
      */
-    public string $orderReference;
-    public function __construct($orderReference)
+    public function __construct(public string $orderReference)
     {
-        $this->orderReference=$orderReference;
+
     }
 
     /**

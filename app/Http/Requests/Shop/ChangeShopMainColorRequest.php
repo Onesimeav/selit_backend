@@ -4,7 +4,7 @@ namespace App\Http\Requests\Shop;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class ChooseShopTemplateRequest extends FormRequest
+class ChangeShopMainColorRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,9 +22,8 @@ class ChooseShopTemplateRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'main_color'=>'required|hex_color',
             'shop_id'=>'required|integer',
-            'template_id'=>'required|integer',
-            'main_color'=>'hex_color',
         ];
     }
 }

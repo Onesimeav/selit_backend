@@ -51,6 +51,7 @@ Route::prefix('v1')->middleware(['auth:sanctum','verified'])->group(function () 
     Route::post('/shops/choose-shop-template',[ShopController::class,'chooseTemplate']);
     Route::post('/shops/add-product-to-shop',[ProductController::class,'addToShop']);
     Route::get('/shops/publish-shop/{id}',[ShopController::class, 'publishShop']);
+    Route::put('/shops/change-main-color',[ShopController::class,'changeShopMainColor']);
     //product
     Route::post('/products',[ProductController::class,'createProduct']);
     Route::get('/products',[ProductController::class,'searchProduct']);
@@ -76,4 +77,5 @@ Route::prefix('v1')->middleware(['auth:sanctum','verified'])->group(function () 
     Route::get('/orders',[OrderController::class,'getOrders']);
     Route::put('/orders/approve-order/{orderId}',[OrderController::class,'setOrderStateAsApproved']);
     Route::put('/orders/delivery-order',[OrderController::class,'setOrderStateAsDelivery']);
+    Route::get('/orders/get-invoice/{orderReference}',[OrderController::class,'getOrderInvoice']);
 });

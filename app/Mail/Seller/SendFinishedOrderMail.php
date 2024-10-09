@@ -4,6 +4,7 @@ namespace App\Mail\Seller;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Mail\Attachment;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Address;
 use Illuminate\Mail\Mailables\Content;
@@ -17,16 +18,9 @@ class SendFinishedOrderMail extends Mailable implements ShouldQueue
     /**
      * Create a new message instance.
      */
-    public string $shopName;
-    public string $shopOwnerName;
-    public string $orderReference;
-    public array $orderProducts;
-    public function __construct($shopName,$shopOwnerName,$orderReference,$orderProducts)
+    public function __construct(public string $shopName, public string $shopOwnerName, public string $orderReference, public array $orderProducts, public $pdf)
     {
-        $this->shopName= $shopName;
-        $this->shopOwnerName=$shopOwnerName;
-        $this->orderReference=$orderReference;
-        $this->orderProducts=$orderProducts;
+
     }
 
     /**
@@ -57,6 +51,9 @@ class SendFinishedOrderMail extends Mailable implements ShouldQueue
      */
     public function attachments(): array
     {
-        return [];
+        return [
+            Attachment::fromData(fn()=> $this->pdf,"$this->orderReference.pdf")
+                    ->withMime('application/pdf'),
+        ];
     }
 }

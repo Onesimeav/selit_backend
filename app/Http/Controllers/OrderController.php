@@ -16,6 +16,7 @@ use App\Models\User;
 use App\Services\ShopOwnershipService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Kkiapay\Kkiapay;
@@ -85,17 +86,11 @@ class OrderController extends Controller
     {
         if ($shopOwnershipService->isShopOwner($request->input('shop_id')))
         {
-            if ($request->input('status')!=null)
-            {
-                $result = Order::where('shop_id',$request->input('shop_id'))
-                        ->where('status',$request->input('status'))
-                        ->paginate(15);
+            $result = Order::query()
+                ->where('shop_id',$request->input('shop_id'))
+                ->when($request->filled('status'),fn($q)=>$q->where('status',$request->input('status')))
+                ->paginate(15);
 
-            }else
-            {
-                $result = Order::where('shop_id',$request->input('shop_id'))->paginate(15);
-
-            }
             return response()->json([
                 'result'=>$result,
             ]);
@@ -174,7 +169,7 @@ class OrderController extends Controller
 
     public function setOrderStateAsDelivered($orderReference): JsonResponse
     {
-        $order = Order::where('order_reference',$orderReference)->first();
+        $order = Order::firstWhere('order_reference',$orderReference);
 
         if ($order!=null)
         {
@@ -204,7 +199,7 @@ class OrderController extends Controller
 
     public function setOrderStateAsFinished(VerifyOrderTransactionRequest $request): JsonResponse
     {
-        $order = Order::where('order_reference',$request->input('order_reference'))->first();
+        $order = Order::firstWhere('order_reference',$request->input('order_reference'))->first();
 
         if ($order!=null)
         {
@@ -230,7 +225,7 @@ class OrderController extends Controller
 
                 //update order state
                 $order->status=OrderStatusEnum::FINISHED;
-
+                $order->save();
                 $orderProducts=$order->products()->get()->toArray();
                 $orderProductsData=[];
                 foreach ($orderProducts as $orderProduct) {
@@ -239,14 +234,9 @@ class OrderController extends Controller
 
                 //generate order invoice
                 $pdf = Pdf::loadView('order.invoice', ['customerName'=>"$order->name $order->surname", 'shopName'=>$shop->name, 'orderProducts'=>$orderProductsData, 'orderPrice'=>$orderPrice, 'orderReference'=>$request->input('order_reference')]);
-                //upload on cloudinary
-                $invoice = $pdf->download($request->input('order_reference').'.pdf');
-                $savedInvoice = $invoice->storeOnCloudinary('invoices');
-                $order->invoice = $savedInvoice->getSecurePath();
-                $order->save();
 
-                Mail::to($order->email)->send(new \App\Mail\Customer\SendFinishedOrderMail($shop->name,"$order->name $order->surname",$order->order_reference,$orderProductsData,$order->invoice));
-                Mail::to($user->email)->send(new \App\Mail\Seller\SendFinishedOrderMail($shop->name,$user->name,$order->order_reference,$orderProductsData));
+                Mail::to($order->email)->send(new \App\Mail\Customer\SendFinishedOrderMail($shop->name,"$order->name $order->surname",$order->order_reference,$orderProductsData,$order->invoice,$pdf));
+                Mail::to($user->email)->send(new \App\Mail\Seller\SendFinishedOrderMail($shop->name,$user->name,$order->order_reference,$orderProductsData,$pdf));
 
                 return response()->json([
                     'message'=>'The order was successfully verified'
@@ -263,9 +253,48 @@ class OrderController extends Controller
         ],404);
     }
 
+    public function getOrderInvoice(ShopOwnershipService $shopOwnershipService, $orderReference): JsonResponse
+    {
+        $order = Order::where('order_reference',$orderReference)->get();
+
+        if ($order!=null)
+        {
+            if ($shopOwnershipService->isShopOwner($order->shop_id))
+            {
+                $shop=Shop::findOrFail($order->shop_id);
+                $user = User::findOrFail($shop->owner_id);
+                $orderPrice =0;
+                $orderProducts=$order->products()->get();
+                foreach ($orderProducts as $orderProduct) {
+                    $orderPrice+= ($orderProduct->pivot->price_promotion_applied*$orderProduct->pivot->product_quantity);
+                }
+                $orderProducts=$order->products()->get()->toArray();
+                $orderProductsData=[];
+                foreach ($orderProducts as $orderProduct) {
+                    $orderProductsData[]=$orderProduct['pivot'];
+                }
+                $pdf = Pdf::loadView('order.invoice', ['customerName'=>"$order->name $order->surname", 'shopName'=>$shop->name, 'orderProducts'=>$orderProductsData, 'orderPrice'=>$orderPrice, 'orderReference'=>$orderReference]);
+
+                Mail::to($user->email)->send(new \App\Mail\Seller\SendFinishedOrderMail($shop->name,$user->name,$order->order_reference,$orderProductsData,$pdf));
+
+                return response()->json([
+                    'message'=>'The invoice have been successfully sent'
+                ]);
+            }
+
+            return response()->json([
+                'message'=>'The user does not own the shop',
+            ],403);
+        }
+
+        return response()->json([
+            'message'=>'The order does not exist'
+        ],404);
+    }
+
     public function cancelOrder(ShopOwnershipService $shopOwnershipService,$orderReference): JsonResponse
     {
-        $order = Order::where('order_reference',$orderReference)->first();
+        $order = Order::firstWhere('order_reference',$orderReference);
 
         if ($order!=null)
         {
@@ -278,7 +307,7 @@ class OrderController extends Controller
                 return response()->json([
                     'message'=>'Order cancelled successfully',
                 ]);
-            }elseif($order->status ==OrderStatusEnum::PENDING || $order->status==OrderStatusEnum::APPROVED)
+            }elseif($order->status ===OrderStatusEnum::PENDING->value || $order->status===OrderStatusEnum::APPROVED->value)
             {
                     $order->status=OrderStatusEnum::CANCELED;
                     $order->save();

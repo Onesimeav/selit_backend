@@ -17,12 +17,9 @@ class SendOrderDeliveryMail extends Mailable implements ShouldQueue
     /**
      * Create a new message instance.
      */
-
-    public string $deliveryLink;
-
-    public function __construct($deliveryLink)
+    public function __construct(public string $deliveryLink)
     {
-        $this->deliveryLink=$deliveryLink;
+
     }
 
     /**

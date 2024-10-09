@@ -17,16 +17,10 @@ class SendApprovedOrderMail extends Mailable implements ShouldQueue
     /**
      * Create a new message instance.
      */
-    public string $shopName;
-    public string $customerName;
-    public string $orderReference;
-    public array $orderProducts;
-    public function __construct($shopName,$customerName,$orderReference,$orderProducts)
+
+    public function __construct(public string $shopName, public string$customerName,public string $orderReference, public array $orderProducts)
     {
-        $this->shopName= $shopName;
-        $this->customerName=$customerName;
-        $this->orderReference=$orderReference;
-        $this->orderProducts=$orderProducts;
+
     }
 
     /**

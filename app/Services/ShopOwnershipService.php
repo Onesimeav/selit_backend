@@ -9,10 +9,7 @@ class ShopOwnershipService
 {
     public function isShopOwner(int $shopId): bool
     {
-        if (Shop::where('id',$shopId)->where('owner_id',Auth::id())->exists()) {
-            return true;
-        }
-        return false;
+        return Shop::where('id',$shopId)->where('owner_id',Auth::id())->exists();
     }
 
 }

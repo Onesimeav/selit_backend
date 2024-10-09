@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('subdomain')->unique();
             $table->boolean('publish')->default('false');
             $table->unsignedBigInteger('owner_id');
+            $table->string('main_color')->nullable();
             $table->unsignedSmallInteger('template_id')->nullable();
             $table->foreign('owner_id')->references('id')->on('users')->onDelete('cascade')->onUpdate('cascade');
             $table->foreign('template_id')->references('id')->on('templates')->onDelete('cascade')->onUpdate('cascade');
