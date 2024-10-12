@@ -17,7 +17,7 @@ class SendNewOrderMail extends Mailable implements ShouldQueue
     /**
      * Create a new message instance.
      */
-    public function __construct(public  string $shopName, public string $customerName, public string $orderReference, public array $orderProducts)
+    public function __construct(public  string $shopName, public string $customerName, public string $orderReference,public int $secret,public array $orderProducts)
     {
 
     }

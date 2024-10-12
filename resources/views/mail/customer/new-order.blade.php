@@ -35,6 +35,8 @@ Your order will be approved soo, by the seller</p>
     @endif
 </ul>
 
+<p>Here is the code to cancel your order : {{$secret}}</p>
+
 <p>If you have any questions or need assistance, feel free to reach out.</p>
 
 <p>Thank you for using our platform!</p>

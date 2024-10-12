@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\OrderStatusEnum;
+use App\Http\Requests\Order\CancelOrderRequest;
 use App\Http\Requests\Order\OrderRequest;
 use App\Http\Requests\Order\OrderSearchRequest;
 use App\Http\Requests\Order\setOrderStateAsDeliveryRequest;
@@ -35,6 +36,7 @@ class OrderController extends Controller
             'number'=>$request->input('number'),
             'location'=>'location',
             'status'=>OrderStatusEnum::PENDING,
+            'secret'=>mt_rand(100000, 999999),
             'shop_id'=>$shop->id,
         ]);
 
@@ -76,7 +78,7 @@ class OrderController extends Controller
         }
         $shopOwner = User::findOrFail($shop->owner_id);
         Mail::to($shopOwner->email)->send(new \App\Mail\Seller\SendNewOrderMail($shop->name,$shopOwner->name,$order->order_reference,$orderProductsData));
-        Mail::to($order->email)->send(new \App\Mail\Customer\SendNewOrderMail($shop->name,"$order->name $order->surname",$order->order_reference,$orderProductsData));
+        Mail::to($order->email)->send(new \App\Mail\Customer\SendNewOrderMail($shop->name,"$order->name $order->surname",$order->order_reference,$order->secret,$orderProductsData));
         return response()->json([
             'message'=>'Order created Successfully'
         ],201);
@@ -292,9 +294,9 @@ class OrderController extends Controller
         ],404);
     }
 
-    public function cancelOrder(ShopOwnershipService $shopOwnershipService,$orderReference): JsonResponse
+    public function cancelOrder(ShopOwnershipService $shopOwnershipService,CancelOrderRequest $request): JsonResponse
     {
-        $order = Order::firstWhere('order_reference',$orderReference);
+        $order = Order::firstWhere('order_reference',$request->input('order_reference'));
 
         if ($order!=null)
         {
@@ -309,14 +311,18 @@ class OrderController extends Controller
                 ]);
             }elseif($order->status ===OrderStatusEnum::PENDING->value || $order->status===OrderStatusEnum::APPROVED->value)
             {
+                if ($request->filled('secret')&& $order->secret===$request->input('secret'))
+                {
                     $order->status=OrderStatusEnum::CANCELED;
                     $order->save();
                     $shop=Shop::findOrFail($order->shop_id);
                     $user = User::findOrFail($shop->owner_id);
-                    Mail::to($user->email)->send(new \App\Mail\Seller\SendCancelledOrderMail($user->name,$orderReference));
+                    Mail::to($user->email)->send(new \App\Mail\Seller\SendCancelledOrderMail($user->name,$request->input('order_reference')));
                     return response()->json([
                         'message'=>'Order cancelled successfully',
                     ]);
+                }
+
             }
 
             return response()->json([

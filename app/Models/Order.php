@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
- * 
+ *
  *
  * @property int $id
  * @property string $order_reference
@@ -54,6 +54,7 @@ class Order extends Model
         'number',
         'location',
         'status',
+        'secret',
         'shop_id',
     ];
 

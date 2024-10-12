@@ -22,7 +22,7 @@ Route::prefix('v1')->group(function () {
     //orders
     Route::post('/orders',[OrderController::class,'createOrder']);
     Route::put('/orders/finish-order',[OrderController::class,'setOrderStateAsFinished']);
-    Route::put('/orders/cancel-order/{orderReference}',[OrderController::class,'cancelOrder']);
+    Route::put('/orders/cancel-order/',[OrderController::class,'cancelOrder']);
     Route::put('orders/delivered-order/{orderReference}',[OrderController::class,'setOrderStateAsDelivered']);
 });
 
@@ -38,14 +38,6 @@ Route::prefix('v1')->middleware(['auth:sanctum','verified'])->group(function () 
     //users
     Route::get('/users/get-balance',[UserController::class,'getBalance']);
     Route::post('/users/withdraw-request',[UserController::class,'makeWithdrawal']);
-    Route::get('/users/get-withdraw-request',[UserController::class,'getWithdrawalRequests']);
-    Route::put('/users/validate-withdraw/{id}',[UserController::class,'validateWithdrawal']);
-    Route::get('test-route',[UserAuthenticationController::class,'testRoute']);
-    //template
-    Route::post('/templates',[TemplateController::class,'createTemplate']);
-    Route::get('/templates',[TemplateController::class,'searchTemplate']);
-    Route::put('/templates/{id}',[TemplateController::class,'updateTemplate']);
-    Route::delete('/templates/{id}',[TemplateController::class,'deleteTemplate']);
     //shop
     Route::post('/shops',[ShopController::class,'createShop']);
     Route::post('/shops/choose-shop-template',[ShopController::class,'chooseTemplate']);
@@ -57,6 +49,11 @@ Route::prefix('v1')->middleware(['auth:sanctum','verified'])->group(function () 
     Route::get('/products',[ProductController::class,'searchProduct']);
     Route::put('/products/{id}',[ProductController::class,'updateProduct']);
     Route::delete('/products/{id}',[ProductController::class,'deleteProduct']);
+    Route::put('/products/add-media/',[ProductController::class,'addMediaToProduct']);
+    Route::put('/products/delete-media/',[ProductController::class,'deleteMediaFromProduct']);
+    Route::put('/products/update-specification/',[ProductController::class,'updateProductSpecifications']);
+    Route::put('/products/add-specification/',[ProductController::class,'addSpecificationsToProduct']);
+    Route::put('/products/delete-specification/',[ProductController::class,'deleteProductSpecifications']);
     //category
     Route::post('/category',[CategoryController::class,'createCategory']);
     Route::get('/category',[CategoryController::class,'searchCategory']);
@@ -78,4 +75,14 @@ Route::prefix('v1')->middleware(['auth:sanctum','verified'])->group(function () 
     Route::put('/orders/approve-order/{orderId}',[OrderController::class,'setOrderStateAsApproved']);
     Route::put('/orders/delivery-order',[OrderController::class,'setOrderStateAsDelivery']);
     Route::get('/orders/get-invoice/{orderReference}',[OrderController::class,'getOrderInvoice']);
+});
+//only admins
+Route::prefix('v1')->middleware(['auth:sanctum','verified'])->group(function () {
+    //template
+    Route::post('/templates',[TemplateController::class,'createTemplate']);
+    Route::get('/templates',[TemplateController::class,'searchTemplate']);
+    Route::put('/templates/{id}',[TemplateController::class,'updateTemplate']);
+    Route::delete('/templates/{id}',[TemplateController::class,'deleteTemplate']);
+    Route::get('/users/get-withdraw-request',[UserController::class,'getWithdrawalRequests']);
+    Route::put('/users/validate-withdraw/{id}',[UserController::class,'validateWithdrawal']);
 });
