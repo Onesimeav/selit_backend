@@ -13,7 +13,8 @@
         "laravel/sanctum": "^4.0",
         "laravel/socialite": "^5.15",
         "laravel/tinker": "^2.9",
-        "nextapps/laravel-verification-code": "^2.1"
+        "nextapps/laravel-verification-code": "^2.1",
+        "rakutentech/laravel-request-docs": "^2.41"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^3.1",
