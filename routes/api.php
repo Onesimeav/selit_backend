@@ -5,6 +5,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PromotionController;
 use App\Http\Controllers\ShopController;
+use App\Http\Controllers\SubdomainController;
 use App\Http\Controllers\TemplateController;
 use App\Http\Controllers\UserAuthenticationController;
 use App\Http\Controllers\MailController;
@@ -24,6 +25,8 @@ Route::prefix('v1')->group(function () {
     Route::put('/orders/finish-order',[OrderController::class,'setOrderStateAsFinished']);
     Route::put('/orders/cancel-order/',[OrderController::class,'cancelOrder']);
     Route::put('orders/delivered-order/{orderReference}',[OrderController::class,'setOrderStateAsDelivered']);
+    //Subdomain
+    Route::get('/subdomain/{domain}',[SubdomainController::class,'index']);
 });
 
 //only logged-in users

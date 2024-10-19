@@ -305,7 +305,7 @@ class OrderController extends Controller
                 $order->status=OrderStatusEnum::CANCELED;
                 $order->save();
                 $shop=Shop::findOrFail($order->shop_id);
-                Mail::to($order->email)->send(new \App\Mail\Customer\SendCancelledOrderMail($shop->name,"$order->name $order->surname",$orderReference));
+                Mail::to($order->email)->send(new \App\Mail\Customer\SendCancelledOrderMail($shop->name,"$order->name $order->surname",$request->input('order_reference')));
                 return response()->json([
                     'message'=>'Order cancelled successfully',
                 ]);

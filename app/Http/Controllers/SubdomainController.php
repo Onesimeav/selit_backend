@@ -9,24 +9,38 @@ use Illuminate\Support\Facades\Auth;
 
 class SubdomainController extends Controller
 {
-    public function index($domain)
+    public function index($domain): \Illuminate\Http\JsonResponse
     {
         $shop = Shop::where('subdomain', $domain)->first();
 
         if (!$shop){
-            return view('templates.404');
+            return response()->json([
+                'message'=>'The shop does not exist'
+            ],404);
         }
 
-        $products = $shop->products();
+        $products = $shop->products()->get()->toArray();
         $template = Template::findOrFail($shop->template_id);
         $template_name = $template->name;
         if (!$shop->publish){
             if ($shop->owner_id==Auth::id()){
-                return view("templates.{$template_name}.preview", compact($shop,$products));
+                return response()->json([
+                    'message'=>'Shops retrived successfully',
+                    'shop'=>$shop->toArray(),
+                    'products'=>$products,
+                    'published'=>false
+                ]);
             }
-            return view('templates.404');
+            return response()->json([
+                'message'=>'The shop is in preview mode',
+            ],404);
         }
-        return view("templates.{$template_name}.index", compact($shop,$products));
+        return response()->json([
+            'message'=>'Shops retrived successfully',
+            'shop'=>$shop->toArray(),
+            'products'=>$products,
+            'published'=>true,
+        ]);
 
     }
 
