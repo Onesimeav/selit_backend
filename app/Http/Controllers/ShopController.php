@@ -18,16 +18,12 @@ class ShopController extends Controller
 {
     public function createShop(ShopCreationRequest $request): JsonResponse
     {
-        //images upload on cloudinary
-        $logo = $request->file('logo')->storeOnCloudinary('shops/logo');
-        $banner = $request->file('banner')->storeOnCloudinary('shops/banner');
-
         //shop creation
        $shop = Shop::create([
            'name'=>$request->input('name'),
            'description'=>$request->input('description'),
-           'logo'=>$logo->getSecurePath(),
-           'banner'=>$banner->getSecurePath(),
+           'logo'=>$request->file('logo')->storeOnCloudinary('shops/logo')->getSecurePath(),
+           'banner'=>$request->file('banner')->storeOnCloudinary('shops/banner')->getSecurePath(),
            'product_type'=>$request->input('product_type'),
            'owner_id'=>Auth::id(),
            'subdomain'=>$request->input('subdomain'),
