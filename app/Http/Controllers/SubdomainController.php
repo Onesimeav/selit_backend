@@ -2,14 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Subdomain\GetShopCategoryProductsRequest;
 use App\Models\Shop;
 use App\Models\Template;
-use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 
 class SubdomainController extends Controller
 {
-    public function index($domain): \Illuminate\Http\JsonResponse
+    public function getShop($domain): JsonResponse
     {
         $shop = Shop::where('subdomain', $domain)->first();
 
@@ -19,15 +20,11 @@ class SubdomainController extends Controller
             ],404);
         }
 
-        $products = $shop->products()->get()->toArray();
-        $template = Template::findOrFail($shop->template_id);
-        $template_name = $template->name;
         if (!$shop->publish){
             if ($shop->owner_id==Auth::id()){
                 return response()->json([
                     'message'=>'Shops retrived successfully',
                     'shop'=>$shop->toArray(),
-                    'products'=>$products,
                     'published'=>false
                 ]);
             }
@@ -38,10 +35,106 @@ class SubdomainController extends Controller
         return response()->json([
             'message'=>'Shops retrived successfully',
             'shop'=>$shop->toArray(),
-            'products'=>$products,
             'published'=>true,
         ]);
 
+    }
+
+    public function getShopCategories($domain): JsonResponse
+    {
+        $shop = Shop::where('subdomain',$domain)->first();
+
+        if (!$shop){
+            return response()->json([
+                'message'=>'The shop does not exist'
+            ],404);
+        }
+
+        $categories=$shop->categories()->get()->toArray();
+
+        if (!$shop->publish){
+            if ($shop->owner_id==Auth::id()){
+                return response()->json([
+                    'message'=>'Categories retrived successfully',
+                    'categories'=>$categories,
+                    'published'=>false
+                ]);
+            }
+            return response()->json([
+                'message'=>'The shop is in preview mode',
+            ],404);
+        }
+        return response()->json([
+            'message'=>'Categories retrived successfully',
+            'categories'=>$categories,
+            'published'=>true
+        ]);
+    }
+
+    public function getShopProducts($domain): JsonResponse
+    {
+        $shop = Shop::where('subdomain',$domain)->first();
+
+        if (!$shop){
+            return response()->json([
+                'message'=>'Shop does not exist'
+            ],404);
+        }
+        $products = $shop->products()->paginate(15)->toArray();
+
+        if (!$shop->publish){
+            if ($shop->owner_id==Auth::id()){
+                return response()->json([
+                    'message'=>'Products retrived successfully',
+                    'products'=>$products,
+                    'published'=>false
+                ]);
+            }
+            return response()->json([
+                'message'=>'The shop is in preview mode',
+            ],404);
+        }
+        return response()->json([
+            'message'=>'Products retrived successfully',
+            'products'=>$products,
+            'published'=>true
+        ]);
+    }
+
+    public function getShopCategoryProducts(GetShopCategoryProductsRequest $request): JsonResponse
+    {
+        $shop = Shop::where('subdomain',$request->input('domain'))->first();
+
+        if (!$shop){
+            return response()->json([
+                'message'=>'This shop does not exist'
+            ],404);
+        }
+
+        $category= $shop->categories()->where('name',$request->input('category'))->get();
+        if ($category){
+            $products = $category->products()->paginate(15)->toArray();
+            if (!$shop->publish){
+                if ($shop->owner_id==Auth::id()){
+                    return response()->json([
+                        'message'=>'Products retrived successfully',
+                        'products'=>$products,
+                        'published'=>false
+                    ]);
+                }
+                return response()->json([
+                    'message'=>'The shop is in preview mode',
+                ],404);
+            }
+            return response()->json([
+                'message'=>'Products retrived successfully',
+                'products'=>$products,
+                'published'=>true
+            ]);
+        }
+        return  response()->json([
+            'message'=>'The category does not exist'
+        ],404);
     }
 
 }
