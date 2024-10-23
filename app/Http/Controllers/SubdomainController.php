@@ -111,7 +111,7 @@ class SubdomainController extends Controller
             ],404);
         }
 
-        $category= $shop->categories()->where('name',$request->input('category'))->get();
+        $category= $shop->categories()->where('id',$request->input('category_id'))->get();
         if ($category){
             $products = $category->products()->paginate(15)->toArray();
             if (!$shop->publish){

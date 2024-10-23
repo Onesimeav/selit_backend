@@ -23,7 +23,7 @@ class GetShopCategoryProductsRequest extends FormRequest
     {
         return [
             'domain'=>'required|string|lowercase',
-            'category'=>'required|string'
+            'category_id'=>'required|integer'
         ];
     }
 }
