@@ -29,7 +29,7 @@ Route::prefix('v1')->group(function () {
     Route::get('/subdomain/{domain}',[SubdomainController::class,'getShop']);
     Route::get('/subdomain/get-products/{domain}',[SubdomainController::class,'getShopProducts']);
     Route::get('/subdomain/get-categories/{domain}',[SubdomainController::class, 'getShopCategories']);
-    Route::get('/subdomain/get-category-product/{domain}',[SubdomainController::class,'getShopCategoryProducts']);
+    Route::get('/subdomain/get-category-product',[SubdomainController::class,'getShopCategoryProducts']);
 });
 
 //only logged-in users

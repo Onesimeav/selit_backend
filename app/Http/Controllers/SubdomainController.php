@@ -50,14 +50,13 @@ class SubdomainController extends Controller
             ],404);
         }
 
-        $categories=$shop->categories()->get()->toArray();
+        $categories=$shop->categories()->paginate(15)->toArray();
 
         if (!$shop->publish){
             if ($shop->owner_id==Auth::id()){
                 return response()->json([
                     'message'=>'Categories retrived successfully',
                     'categories'=>$categories,
-                    'published'=>false
                 ]);
             }
             return response()->json([
@@ -67,7 +66,6 @@ class SubdomainController extends Controller
         return response()->json([
             'message'=>'Categories retrived successfully',
             'categories'=>$categories,
-            'published'=>true
         ]);
     }
 
@@ -87,7 +85,6 @@ class SubdomainController extends Controller
                 return response()->json([
                     'message'=>'Products retrived successfully',
                     'products'=>$products,
-                    'published'=>false
                 ]);
             }
             return response()->json([
@@ -97,7 +94,6 @@ class SubdomainController extends Controller
         return response()->json([
             'message'=>'Products retrived successfully',
             'products'=>$products,
-            'published'=>true
         ]);
     }
 
@@ -119,7 +115,6 @@ class SubdomainController extends Controller
                     return response()->json([
                         'message'=>'Products retrived successfully',
                         'products'=>$products,
-                        'published'=>false
                     ]);
                 }
                 return response()->json([
@@ -129,7 +124,6 @@ class SubdomainController extends Controller
             return response()->json([
                 'message'=>'Products retrived successfully',
                 'products'=>$products,
-                'published'=>true
             ]);
         }
         return  response()->json([
