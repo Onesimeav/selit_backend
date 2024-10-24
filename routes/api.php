@@ -12,35 +12,36 @@ use App\Http\Controllers\MailController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
-Route::prefix('v1')->group(function () {
-    Route::post('login', [UserAuthenticationController::class, 'login']);
-    Route::post('register', [UserAuthenticationController::class, 'register']);
-    Route::get('send-test-mail', [MailController::class, 'index']);
-    Route::get('/google-auth',[UserAuthenticationController::class,'redirectToGoogleAuth']);
-    Route::get('/google-auth-callback',[UserAuthenticationController::class, 'handleGoogleAuthCallback']);
-    Route::post('/forgot-password',[UserAuthenticationController::class,'forgotPassword']);
-    Route::post('/reset-password',[UserAuthenticationController::class,'verifyPasswordCode']);
-    //orders
-    Route::post('/orders',[OrderController::class,'createOrder']);
-    Route::put('/orders/finish-order',[OrderController::class,'setOrderStateAsFinished']);
-    Route::put('/orders/cancel-order/',[OrderController::class,'cancelOrder']);
-    Route::put('orders/delivered-order/{orderReference}',[OrderController::class,'setOrderStateAsDelivered']);
-    //Subdomain
-    Route::get('/subdomain/{domain}',[SubdomainController::class,'getShop']);
-    Route::get('/subdomain/get-products/{domain}',[SubdomainController::class,'getShopProducts']);
-    Route::get('/subdomain/get-categories/{domain}',[SubdomainController::class, 'getShopCategories']);
-    Route::get('/subdomain/get-category-product',[SubdomainController::class,'getShopCategoryProducts']);
-});
+
+Route::post('login', [UserAuthenticationController::class, 'login']);
+Route::post('register', [UserAuthenticationController::class, 'register']);
+Route::get('send-test-mail', [MailController::class, 'index']);
+Route::get('/google-auth', [UserAuthenticationController::class, 'redirectToGoogleAuth']);
+Route::get('/google-auth-callback', [UserAuthenticationController::class, 'handleGoogleAuthCallback']);
+Route::post('/forgot-password', [UserAuthenticationController::class, 'forgotPassword']);
+Route::post('/reset-password', [UserAuthenticationController::class, 'verifyPasswordCode']);
+//orders
+Route::post('/orders', [OrderController::class, 'createOrder']);
+Route::put('/orders/finish-order', [OrderController::class, 'setOrderStateAsFinished']);
+Route::put('/orders/cancel-order/', [OrderController::class, 'cancelOrder']);
+Route::put('orders/delivered-order/{orderReference}', [OrderController::class, 'setOrderStateAsDelivered']);
+//Subdomain
+Route::get('/subdomain/{domain}', [SubdomainController::class, 'getShop']);
+Route::get('/subdomain/{domain}/get-products', [SubdomainController::class, 'getShopProducts']);
+Route::get('/subdomain/{domain}/get-categories', [SubdomainController::class, 'getShopCategories']);
+Route::get('/subdomain/{domain}/get-category-product', [SubdomainController::class, 'getShopCategoryProducts']);
+Route::get('/subdomain/{domain}/category/{id}/products', [SubdomainController::class, 'getShopCategoryProducts']);
+
 
 //only logged-in users
-Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
+Route::middleware('auth:sanctum')->group(function () {
     Route::get('resend-verification-code',[UserAuthenticationController::class,'resendVerificationCode']);
     Route::get('verify-code/{code}',[UserAuthenticationController::class,'verifyCode']);
     Route::post('logout', [UserAuthenticationController::class, 'logout']);
 });
 
 //Only for verified users
-Route::prefix('v1')->middleware(['auth:sanctum','verified'])->group(function () {
+Route::middleware(['auth:sanctum','verified'])->group(function () {
     //users
     Route::get('/users/get-balance',[UserController::class,'getBalance']);
     Route::post('/users/withdraw-request',[UserController::class,'makeWithdrawal']);
@@ -83,7 +84,7 @@ Route::prefix('v1')->middleware(['auth:sanctum','verified'])->group(function () 
     Route::get('/orders/get-invoice/{orderReference}',[OrderController::class,'getOrderInvoice']);
 });
 //only admins
-Route::prefix('v1')->middleware(['auth:sanctum','verified'])->group(function () {
+Route::middleware(['auth:sanctum','verified'])->group(function () {
     //template
     Route::post('/templates',[TemplateController::class,'createTemplate']);
     Route::get('/templates',[TemplateController::class,'searchTemplate']);
