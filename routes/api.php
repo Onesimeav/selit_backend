@@ -29,7 +29,6 @@ Route::put('orders/delivered-order/{orderReference}', [OrderController::class, '
 Route::get('/subdomain/{domain}', [SubdomainController::class, 'getShop']);
 Route::get('/subdomain/{domain}/get-products', [SubdomainController::class, 'getShopProducts']);
 Route::get('/subdomain/{domain}/get-categories', [SubdomainController::class, 'getShopCategories']);
-Route::get('/subdomain/{domain}/get-category-product', [SubdomainController::class, 'getShopCategoryProducts']);
 Route::get('/subdomain/{domain}/category/{id}/products', [SubdomainController::class, 'getShopCategoryProducts']);
 
 
@@ -93,3 +92,4 @@ Route::middleware(['auth:sanctum','verified'])->group(function () {
     Route::get('/users/get-withdraw-request',[UserController::class,'getWithdrawalRequests']);
     Route::put('/users/validate-withdraw/{id}',[UserController::class,'validateWithdrawal']);
 });
+
