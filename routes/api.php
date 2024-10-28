@@ -30,7 +30,8 @@ Route::get('/subdomain/{domain}', [SubdomainController::class, 'getShop']);
 Route::get('/subdomain/{domain}/get-products', [SubdomainController::class, 'getShopProducts']);
 Route::get('/subdomain/{domain}/get-categories', [SubdomainController::class, 'getShopCategories']);
 Route::get('/subdomain/{domain}/category/{id}/products', [SubdomainController::class, 'getShopCategoryProducts']);
-
+//products
+Route::get('/products/get-product/{id}',[ProductController::class,'getProduct']);
 
 //only logged-in users
 Route::middleware('auth:sanctum')->group(function () {
@@ -83,7 +84,7 @@ Route::middleware(['auth:sanctum','verified'])->group(function () {
     Route::get('/orders/get-invoice/{orderReference}',[OrderController::class,'getOrderInvoice']);
 });
 //only admins
-Route::middleware(['auth:sanctum','verified'])->group(function () {
+Route::middleware(['auth:sanctum','admin'])->group(function () {
     //template
     Route::post('/templates',[TemplateController::class,'createTemplate']);
     Route::get('/templates',[TemplateController::class,'searchTemplate']);

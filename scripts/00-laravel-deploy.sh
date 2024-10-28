@@ -13,3 +13,6 @@ php artisan migrate --force
 
 echo "Start the queue worker..."
 php artisan queue:work --daemon &
+
+echo "Publishing laravel request docs assets"
+php artisan vendor:publish --tag=request-docs-assets

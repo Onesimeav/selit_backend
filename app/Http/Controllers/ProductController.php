@@ -107,6 +107,20 @@ class ProductController extends Controller
         ]);
     }
 
+    public function getProduct($id): JsonResponse
+    {
+        $product = Product::find($id);
+        if ($product!=null){
+            return  response()->json([
+                'message'=>'Product retrieved successfully',
+                'product'=>$product->toArray(),
+            ]);
+        }
+        return response()->json([
+            'message'=>'The product does not exist'
+        ],404);
+    }
+
     public function updateProduct(ProductUpdateRequest $request,ProductOwnershipService $productOwnershipService, $id):JsonResponse
     {
         if ($productOwnershipService->isProductOwner($id))
