@@ -6,6 +6,7 @@ use App\Http\Requests\Promotion\AddToPromotionRequest;
 use App\Http\Requests\Promotion\PromotionRequest;
 use App\Http\Requests\Promotion\PromotionSearchRequest;
 use App\Http\Requests\Promotion\PromotionUpdateRequest;
+use App\Http\Requests\Promotion\VerifyPromotionCodeRequest;
 use App\Models\Promotion;
 use App\Services\ProductOwnershipService;
 use App\Services\ShopOwnershipService;
@@ -207,8 +208,9 @@ class PromotionController extends Controller
         ],404);
     }
 
-    public function verifyPromoCode($code): JsonResponse
+    public function verifyPromoCode(VerifyPromotionCodeRequest $request): JsonResponse
     {
+        $code = $request->input('code');
         $promotion = Promotion::where('code',$code)->first();
 
         if ($promotion!=null)
@@ -220,10 +222,16 @@ class PromotionController extends Controller
                     'message'=>'Promotion code expired'
                 ]);
             }
-
+            $products=$promotion->products()->whereIn('products.id',$request->input('products'))->pluck('products.id');
+            if ($products!=null){
+                return response()->json([
+                    'message'=>'Promotion found',
+                    'promotion'=>$promotion->toArray(),
+                    'products'=>$products->toArray(),
+                ]);
+            }
             return response()->json([
-                'message'=>'Promotion found',
-                'promotion'=>$promotion
+                'message'=>'The promotion does not apply to the products',
             ]);
         }
 

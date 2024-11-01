@@ -23,8 +23,10 @@ Route::post('/reset-password', [UserAuthenticationController::class, 'verifyPass
 //orders
 Route::post('/orders', [OrderController::class, 'createOrder']);
 Route::put('/orders/finish-order', [OrderController::class, 'setOrderStateAsFinished']);
-Route::put('/orders/cancel-order/', [OrderController::class, 'cancelOrder']);
+Route::put('/orders/cancel-order', [OrderController::class, 'cancelOrder']);
 Route::put('orders/delivered-order/{orderReference}', [OrderController::class, 'setOrderStateAsDelivered']);
+//promotion
+Route::get('/promotions/verify-code',[PromotionController::class,'verifyPromoCode']);
 //Subdomain
 Route::get('/subdomain/{domain}', [SubdomainController::class, 'getShop']);
 Route::get('/subdomain/{domain}/get-products', [SubdomainController::class, 'getShopProducts']);
@@ -76,7 +78,6 @@ Route::middleware(['auth:sanctum','verified'])->group(function () {
     Route::delete('/promotions/{id}',[PromotionController::class,'deletePromotion']);
     Route::post('/promotions/add-products',[PromotionController::class,'addProductsToPromotion']);
     Route::post('/promotions/remove-products',[PromotionController::class,'removeProductFromPromotion']);
-    Route::get('/promotions/verify-code/{code}',[PromotionController::class,'verifyPromoCode']);
     //order
     Route::get('/orders',[OrderController::class,'getOrders']);
     Route::put('/orders/approve-order/{orderId}',[OrderController::class,'setOrderStateAsApproved']);
