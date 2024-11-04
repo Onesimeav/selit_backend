@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $order_id
@@ -52,8 +52,11 @@ class OrderProduct extends Pivot
         'product_name',
         'product_price',
         'product_quantity',
-        'promotion_id',
-        'promotion_code',
         'price_promotion_applied',
     ];
+
+    public function promotions()
+    {
+        return $this->belongsToMany(Promotion::class)->using(OrderProductPromotion::class)->withPivot('code');
+    }
 }

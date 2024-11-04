@@ -56,6 +56,15 @@ class PromotionController extends Controller
         return response()->json([],403);
     }
 
+    public function getPromotion($id): JsonResponse
+    {
+        $promotion = Promotion::findOrFail($id);
+        return response()->json([
+            'message'=>'Promotion retrieved successfully',
+            'promotion'=>$promotion->toArray(),
+        ]);
+    }
+
     public function searchPromotion(PromotionSearchRequest $request, ShopOwnershipService $shopOwnershipService): JsonResponse
     {
         $shop_id = $request->input('shop_id');

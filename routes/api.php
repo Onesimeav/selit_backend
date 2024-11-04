@@ -27,6 +27,7 @@ Route::put('/orders/cancel-order', [OrderController::class, 'cancelOrder']);
 Route::put('orders/delivered-order/{orderReference}', [OrderController::class, 'setOrderStateAsDelivered']);
 //promotion
 Route::get('/promotions/verify-code',[PromotionController::class,'verifyPromoCode']);
+Route::get('/promotions/{id}',[PromotionController::class,'getPromotion']);
 //Subdomain
 Route::get('/subdomain/{domain}', [SubdomainController::class, 'getShop']);
 Route::get('/subdomain/{domain}/get-products', [SubdomainController::class, 'getShopProducts']);

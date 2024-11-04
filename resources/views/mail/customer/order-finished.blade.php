@@ -22,7 +22,7 @@
                 <strong>Quantity:</strong> {{ $orderProduct['product_quantity'] }}
                 <br>
                 @if(isset($orderProduct['promotion_code']))
-                    <strong>Promotion code:</strong> {{ $orderProduct['promotion_code'] }}
+                    <strong>Promotion code:</strong>@foreach($orderProduct['promotion_code'] as $code) {{ $code, }} @endforeach
                     <br>
                     <strong>Price promotion applied:</strong> {{ $orderProduct['price_promotion_applied'] }}
                 @endif

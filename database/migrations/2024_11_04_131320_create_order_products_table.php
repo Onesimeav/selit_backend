@@ -18,12 +18,9 @@ return new class extends Migration
             $table->string('product_name');
             $table->integer('product_price');
             $table->integer('product_quantity');
-            $table->unsignedBigInteger('promotion_id')->nullable();
-            $table->string('promotion_code')->nullable();
             $table->integer('price_promotion_applied');
             $table->foreign('order_id')->references('id')->on('orders')->onUpdate('cascade');
             $table->foreign('product_id')->references('id')->on('products')->onUpdate('cascade');
-            $table->foreign('promotion_id')->references('id')->on('promotions')->onUpdate('cascade');
             $table->timestamps();
         });
     }
@@ -33,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('order_products');
+        Schema::dropIfExists('order_product');
     }
 };

@@ -55,7 +55,9 @@
                 </td>
                 @if(isset($orderProducts['promotion_code']))
                     <td>
-                        {{ $orderProduct['promotion_code'] }}
+                        @foreach($orderProduct['promotion_code'] as $code)
+                            {{ $code, }}
+                        @endforeach
                     </td>
                     <td>
                         {{ $orderProduct['price_promotion_applied'] }}

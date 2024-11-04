@@ -10,6 +10,7 @@ use App\Http\Requests\Order\setOrderStateAsDeliveryRequest;
 use App\Http\Requests\Order\VerifyOrderTransactionRequest;
 use App\Models\Order;
 use App\Models\OrderProduct;
+use App\Models\OrderProductPromotion;
 use App\Models\Product;
 use App\Models\Promotion;
 use App\Models\Shop;
@@ -42,39 +43,52 @@ class OrderController extends Controller
 
         $orderProducts=$request->input('products');
         foreach ($orderProducts as $orderProduct) {
-            $product_id=$orderProduct['product_id'];
-            $product=Product::findOrFail($product_id);
+            $productId=$orderProduct['product_id'];
+            $product=Product::findOrFail($productId);
+            $promotionValue=0;
+            $pricePromotionApplied=$product->price;
+            if (isset($orderProduct['promotion_id'])){
+                $promotionsIds = $orderProduct['promotion_id'];
+                foreach ($promotionsIds as $promotionId ){
+                    $promotion = Promotion::findOrFail($promotionId);
+                    $promotionValue+=$promotion->value;
+                }
+                $pricePromotionApplied= ($product->price*$promotionValue)/100;
+            }
+            $orderProductCollection=OrderProduct::create([
+                'order_id'=>$order->id,
+                'product_id'=>$product->id,
+                'product_name'=>$product->name,
+                'product_price'=>$product->price,
+                'product_quantity'=>$orderProduct['quantity'],
+                'price_promotion_applied'=>$pricePromotionApplied,
+            ]);
             if (isset($orderProduct['promotion_id']))
             {
-                $promotion_id=$orderProduct['promotion_id'];
-                $promotion=Promotion::findOrFail($promotion_id);
+                $promotionsIds = $orderProduct['promotion_id'];
+                foreach ($promotionsIds as $promotionId ){
+                    $promotion = Promotion::findOrFail($promotionId);
+                    OrderProductPromotion::create([
+                        'promotion_id'=>$promotion->id,
+                        'orderProduct_id'=>$orderProductCollection->id,
+                        'code'=>$promotion->code,
+                    ]);
+                }
 
-                OrderProduct::create([
-                    'order_id'=>$order->id,
-                    'product_id'=>$product->id,
-                    'product_name'=>$product->name,
-                    'product_price'=>$product->price,
-                    'product_quantity'=>$orderProduct['quantity'],
-                    'promotion_id'=>$promotion_id,
-                    'promotion_code'=>$promotion->code,
-                    'price_promotion_applied'=>($product->price*$promotion->value)/100,
-                ]);
-            }else{
-                OrderProduct::create([
-                    'order_id'=>$order->id,
-                    'product_id'=>$product->id,
-                    'product_name'=>$product->name,
-                    'product_price'=>$product->price,
-                    'product_quantity'=>$orderProduct['quantity'],
-                    'price_promotion_applied'=>$product->price,
-                ]);
             }
         }
 
-        $orderProducts=$order->products()->get()->toArray();
+        $orderProducts=$order->products()->get();
         $orderProductsData=[];
         foreach ($orderProducts as $orderProduct) {
-            $orderProductsData[]=$orderProduct['pivot'];
+            $orderProductPromotions=$orderProduct->promtions()->get()->toArray();
+            $promotionCodes=[];
+            foreach ($orderProductPromotions as $orderProductPromotion){
+                $promotionCodes[]=$orderProductPromotion['pivot']['code'];
+            }
+            $orderProduct = $orderProduct->pivot->toArray();
+            $orderProduct['promotion_code']=$promotionCodes;
+            $orderProductsData[]=$orderProduct;
         }
         $shopOwner = User::findOrFail($shop->owner_id);
         Mail::to($shopOwner->email)->send(new \App\Mail\Seller\SendNewOrderMail($shop->name,$shopOwner->name,$order->order_reference,$orderProductsData));
@@ -111,10 +125,17 @@ class OrderController extends Controller
             $order->save();
 
             $shop = Shop::findOrFail($order->shop_id);
-            $orderProducts=$order->products()->get()->toArray();
+            $orderProducts=$order->products()->get();
             $orderProductsData=[];
             foreach ($orderProducts as $orderProduct) {
-                $orderProductsData[]=$orderProduct['pivot'];
+                $orderProductPromotions=$orderProduct->promtions()->get()->toArray();
+                $promotionCodes=[];
+                foreach ($orderProductPromotions as $orderProductPromotion){
+                    $promotionCodes[]=$orderProductPromotion['pivot']['code'];
+                }
+                $orderProduct = $orderProduct->pivot->toArray();
+                $orderProduct['promotion_code']=$promotionCodes;
+                $orderProductsData[]=$orderProduct;
             }
             Mail::to($order->email)->send(new \App\Mail\Customer\SendApprovedOrderMail($shop->name,"$order->name $order->surname",$order->order_reference,$orderProductsData));
 
@@ -138,10 +159,17 @@ class OrderController extends Controller
 
             $deliveryLink = "https://www.selit.store/order/delivery/$order->order_reference";
             $shop = Shop::findOrFail($order->shop_id);
-            $orderProducts=$order->products()->get()->toArray();
+            $orderProducts=$order->products()->get();
             $orderProductsData=[];
             foreach ($orderProducts as $orderProduct) {
-                $orderProductsData[]=$orderProduct['pivot'];
+                $orderProductPromotions=$orderProduct->promtions()->get()->toArray();
+                $promotionCodes=[];
+                foreach ($orderProductPromotions as $orderProductPromotion){
+                    $promotionCodes[]=$orderProductPromotion['pivot']['code'];
+                }
+                $orderProduct = $orderProduct->pivot->toArray();
+                $orderProduct['promotion_code']=$promotionCodes;
+                $orderProductsData[]=$orderProduct;
             }
             Mail::to($order->email)->send(new \App\Mail\Customer\SendOrderDeliveryMail($shop->name,"$order->name $order->surname",$order->order_reference,$orderProductsData));
             Mail::to($request->input('deliveryman_email'))->send(new \App\Mail\DeliveryMan\SendOrderDeliveryMail($deliveryLink));
@@ -180,10 +208,17 @@ class OrderController extends Controller
 
             $shop = Shop::findOrFail($order->shop_id);
             $shopOwner = User::findOrFail($shop->owner_id);
-            $orderProducts=$order->products()->get()->toArray();
+            $orderProducts=$order->products()->get();
             $orderProductsData=[];
             foreach ($orderProducts as $orderProduct) {
-                $orderProductsData[]=$orderProduct['pivot'];
+                $orderProductPromotions=$orderProduct->promtions()->get()->toArray();
+                $promotionCodes=[];
+                foreach ($orderProductPromotions as $orderProductPromotion){
+                    $promotionCodes[]=$orderProductPromotion['pivot']['code'];
+                }
+                $orderProduct = $orderProduct->pivot->toArray();
+                $orderProduct['promotion_code']=$promotionCodes;
+                $orderProductsData[]=$orderProduct;
             }
             Mail::to($order->email)->send(new \App\Mail\Customer\SendOrderDeliveredMail($shop->name,"$order->name $order->surname",$orderReference,$orderProductsData));
             Mail::to($shopOwner->email)->send(new \App\Mail\Seller\SendOrderDeliveredMail($shop->name,$shopOwner->name,$orderReference,$orderProductsData));
@@ -228,10 +263,17 @@ class OrderController extends Controller
                 //update order state
                 $order->status=OrderStatusEnum::FINISHED;
                 $order->save();
-                $orderProducts=$order->products()->get()->toArray();
+                $orderProducts=$order->products()->get();
                 $orderProductsData=[];
                 foreach ($orderProducts as $orderProduct) {
-                    $orderProductsData[]=$orderProduct['pivot'];
+                    $orderProductPromotions=$orderProduct->promtions()->get()->toArray();
+                    $promotionCodes=[];
+                    foreach ($orderProductPromotions as $orderProductPromotion){
+                        $promotionCodes[]=$orderProductPromotion['pivot']['code'];
+                    }
+                    $orderProduct = $orderProduct->pivot->toArray();
+                    $orderProduct['promotion_code']=$promotionCodes;
+                    $orderProductsData[]=$orderProduct;
                 }
 
                 //generate order invoice
@@ -270,10 +312,17 @@ class OrderController extends Controller
                 foreach ($orderProducts as $orderProduct) {
                     $orderPrice+= ($orderProduct->pivot->price_promotion_applied*$orderProduct->pivot->product_quantity);
                 }
-                $orderProducts=$order->products()->get()->toArray();
+                $orderProducts=$order->products()->get();
                 $orderProductsData=[];
                 foreach ($orderProducts as $orderProduct) {
-                    $orderProductsData[]=$orderProduct['pivot'];
+                    $orderProductPromotions=$orderProduct->promtions()->get()->toArray();
+                    $promotionCodes=[];
+                    foreach ($orderProductPromotions as $orderProductPromotion){
+                        $promotionCodes[]=$orderProductPromotion['pivot']['code'];
+                    }
+                    $orderProduct = $orderProduct->pivot->toArray();
+                    $orderProduct['promotion_code']=$promotionCodes;
+                    $orderProductsData[]=$orderProduct;
                 }
                 $pdf = Pdf::loadView('order.invoice', ['customerName'=>"$order->name $order->surname", 'shopName'=>$shop->name, 'orderProducts'=>$orderProductsData, 'orderPrice'=>$orderPrice, 'orderReference'=>$orderReference]);
 
