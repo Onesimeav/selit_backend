@@ -14,10 +14,10 @@ return new class extends Migration
         Schema::create('order_product_promotion', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('promotion_id');
-            $table->unsignedBigInteger('orderProduct_id');
+            $table->unsignedBigInteger('order_id');
             $table->string('code');
             $table->foreign('promotion_id')->references('id')->on('promotions')->onUpdate('cascade');
-            $table->foreign('orderProduct_id')->references('id')->on('order_product')->onUpdate('cascade');
+            $table->foreign('order_id')->references('id')->on('order_product')->onUpdate('cascade');
             $table->timestamps();
         });
     }

@@ -47,13 +47,21 @@ class OrderController extends Controller
             $product=Product::findOrFail($productId);
             $promotionValue=0;
             $pricePromotionApplied=$product->price;
+            $autoAppliedPromotions = $product->autoApplyPromotions;
+            if ($autoAppliedPromotions){
+                foreach ($autoAppliedPromotions as $autoAppliedPromotion){
+                    $promotionValue+=$autoAppliedPromotion->value;
+                }
+            }
             if (isset($orderProduct['promotion_id'])){
                 $promotionsIds = $orderProduct['promotion_id'];
                 foreach ($promotionsIds as $promotionId ){
                     $promotion = Promotion::findOrFail($promotionId);
                     $promotionValue+=$promotion->value;
                 }
-                $pricePromotionApplied= ($product->price*$promotionValue)/100;
+            }
+            if ($promotionValue!=0){
+                $pricePromotionApplied= ($product->price*(100-$promotionValue))/100;
             }
             $orderProductCollection=OrderProduct::create([
                 'order_id'=>$order->id,
@@ -70,7 +78,7 @@ class OrderController extends Controller
                     $promotion = Promotion::findOrFail($promotionId);
                     OrderProductPromotion::create([
                         'promotion_id'=>$promotion->id,
-                        'orderProduct_id'=>$orderProductCollection->id,
+                        'order_id'=>$orderProductCollection->id,
                         'code'=>$promotion->code,
                     ]);
                 }
@@ -81,7 +89,7 @@ class OrderController extends Controller
         $orderProducts=$order->products()->get();
         $orderProductsData=[];
         foreach ($orderProducts as $orderProduct) {
-            $orderProductPromotions=$orderProduct->promotions()->get()->toArray();
+            $orderProductPromotions=$orderProduct->pivot->promotions()->get()->toArray();
             $promotionCodes=[];
             foreach ($orderProductPromotions as $orderProductPromotion){
                 $promotionCodes[]=$orderProductPromotion['pivot']['code'];
@@ -94,7 +102,8 @@ class OrderController extends Controller
         Mail::to($shopOwner->email)->send(new \App\Mail\Seller\SendNewOrderMail($shop->name,$shopOwner->name,$order->order_reference,$orderProductsData));
         Mail::to($order->email)->send(new \App\Mail\Customer\SendNewOrderMail($shop->name,"$order->name $order->surname",$order->order_reference,$order->secret,$orderProductsData));
         return response()->json([
-            'message'=>'Order created Successfully'
+            'message'=>'Order created Successfully',
+            'order'=>$order->id,
         ],201);
     }
 
@@ -128,7 +137,7 @@ class OrderController extends Controller
             $orderProducts=$order->products()->get();
             $orderProductsData=[];
             foreach ($orderProducts as $orderProduct) {
-                $orderProductPromotions=$orderProduct->promotions()->get()->toArray();
+                $orderProductPromotions=$orderProduct->pivot->promotions()->get()->toArray();
                 $promotionCodes=[];
                 foreach ($orderProductPromotions as $orderProductPromotion){
                     $promotionCodes[]=$orderProductPromotion['pivot']['code'];
@@ -162,7 +171,7 @@ class OrderController extends Controller
             $orderProducts=$order->products()->get();
             $orderProductsData=[];
             foreach ($orderProducts as $orderProduct) {
-                $orderProductPromotions=$orderProduct->promotions()->get()->toArray();
+                $orderProductPromotions=$orderProduct->pivot->promotions()->get()->toArray();
                 $promotionCodes=[];
                 foreach ($orderProductPromotions as $orderProductPromotion){
                     $promotionCodes[]=$orderProductPromotion['pivot']['code'];
@@ -211,7 +220,7 @@ class OrderController extends Controller
             $orderProducts=$order->products()->get();
             $orderProductsData=[];
             foreach ($orderProducts as $orderProduct) {
-                $orderProductPromotions=$orderProduct->promotions()->get()->toArray();
+                $orderProductPromotions=$orderProduct->pivot->promotions()->get()->toArray();
                 $promotionCodes=[];
                 foreach ($orderProductPromotions as $orderProductPromotion){
                     $promotionCodes[]=$orderProductPromotion['pivot']['code'];

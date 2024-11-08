@@ -10,9 +10,12 @@ class OrderProductPromotion extends Pivot
     use HasFactory;
 
     public $incrementing=true;
+
     protected $fillable = [
-        'orderProduct_id',
+        'order_id',
         'promotion_id',
         'code',
     ];
+
+
 }

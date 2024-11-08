@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
- * 
+ *
  *
  * @property int $id
  * @property string $name
@@ -92,4 +92,5 @@ class Product extends Model
    {
        return $this->belongsToMany(Order::class)->using(OrderProduct::class);
    }
+
 }
