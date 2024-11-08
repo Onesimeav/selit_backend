@@ -81,7 +81,7 @@ class OrderController extends Controller
         $orderProducts=$order->products()->get();
         $orderProductsData=[];
         foreach ($orderProducts as $orderProduct) {
-            $orderProductPromotions=$orderProduct->promtions()->get()->toArray();
+            $orderProductPromotions=$orderProduct->promotions()->get()->toArray();
             $promotionCodes=[];
             foreach ($orderProductPromotions as $orderProductPromotion){
                 $promotionCodes[]=$orderProductPromotion['pivot']['code'];
@@ -128,7 +128,7 @@ class OrderController extends Controller
             $orderProducts=$order->products()->get();
             $orderProductsData=[];
             foreach ($orderProducts as $orderProduct) {
-                $orderProductPromotions=$orderProduct->promtions()->get()->toArray();
+                $orderProductPromotions=$orderProduct->promotions()->get()->toArray();
                 $promotionCodes=[];
                 foreach ($orderProductPromotions as $orderProductPromotion){
                     $promotionCodes[]=$orderProductPromotion['pivot']['code'];
@@ -162,7 +162,7 @@ class OrderController extends Controller
             $orderProducts=$order->products()->get();
             $orderProductsData=[];
             foreach ($orderProducts as $orderProduct) {
-                $orderProductPromotions=$orderProduct->promtions()->get()->toArray();
+                $orderProductPromotions=$orderProduct->promotions()->get()->toArray();
                 $promotionCodes=[];
                 foreach ($orderProductPromotions as $orderProductPromotion){
                     $promotionCodes[]=$orderProductPromotion['pivot']['code'];
@@ -211,7 +211,7 @@ class OrderController extends Controller
             $orderProducts=$order->products()->get();
             $orderProductsData=[];
             foreach ($orderProducts as $orderProduct) {
-                $orderProductPromotions=$orderProduct->promtions()->get()->toArray();
+                $orderProductPromotions=$orderProduct->promotions()->get()->toArray();
                 $promotionCodes=[];
                 foreach ($orderProductPromotions as $orderProductPromotion){
                     $promotionCodes[]=$orderProductPromotion['pivot']['code'];
@@ -266,7 +266,7 @@ class OrderController extends Controller
                 $orderProducts=$order->products()->get();
                 $orderProductsData=[];
                 foreach ($orderProducts as $orderProduct) {
-                    $orderProductPromotions=$orderProduct->promtions()->get()->toArray();
+                    $orderProductPromotions=$orderProduct->promotions()->get()->toArray();
                     $promotionCodes=[];
                     foreach ($orderProductPromotions as $orderProductPromotion){
                         $promotionCodes[]=$orderProductPromotion['pivot']['code'];
@@ -315,7 +315,7 @@ class OrderController extends Controller
                 $orderProducts=$order->products()->get();
                 $orderProductsData=[];
                 foreach ($orderProducts as $orderProduct) {
-                    $orderProductPromotions=$orderProduct->promtions()->get()->toArray();
+                    $orderProductPromotions=$orderProduct->promotions()->get()->toArray();
                     $promotionCodes=[];
                     foreach ($orderProductPromotions as $orderProductPromotion){
                         $promotionCodes[]=$orderProductPromotion['pivot']['code'];
