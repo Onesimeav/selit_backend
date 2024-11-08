@@ -16,7 +16,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->api(prepend: [
             \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
             \Rakutentech\LaravelRequestDocs\LaravelRequestDocsMiddleware::class,
-            Fruitcake\Cors\CorsService::class,
+            \Illuminate\Http\Middleware\HandleCors::class
         ]);
 
         $middleware->alias([
