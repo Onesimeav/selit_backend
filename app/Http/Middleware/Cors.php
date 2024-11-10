@@ -16,7 +16,7 @@ class Cors
     public function handle(Request $request, Closure $next): Response
     {
         return $next($request)
-            ->header('Access-Control-Allow-Origin', 'localhost:5173,selit.store')
+            ->header('Access-Control-Allow-Origin', 'sandiego.localhost:5173,sandiego.selit.store')
             ->header('Access-Control-Allow-Methods', '*')
             ->header('Access-Control-Allow-Credentials', true)
             ->header('Access-Control-Allow-Headers', 'X-Requested-With,Content-Type,X-Token-Auth,Authorization')
