@@ -17,13 +17,13 @@ return [
 
     'paths' => ['api/*','sanctum/csrf-cookie'],
 
-    'allowed_methods' => ['*'],
+    'allowed_methods' => ['GET', 'POST', 'PUT', 'OPTIONS','DELETE'],
 
-    'allowed_origins' => ['*'],
+    'allowed_origins' => ['*.selit.store','selit.store','sandiego.selit.store','*.localhost:5173','localhost:5173','sandiego.localhost:5173'],
 
     'allowed_origins_patterns' => [],
 
-    'allowed_headers' => ['*'],
+    'allowed_headers' => ['Origin', 'Content-Type', 'X-Auth-Token', 'Cookie','Authorization'],
 
     'exposed_headers' => [],
 
