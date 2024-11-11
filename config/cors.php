@@ -21,7 +21,7 @@ return [
 
     'allowed_origins' => ['*.selit.store','selit.store','sandiego.selit.store','*.localhost:5173','localhost:5173','sandiego.localhost:5173'],
 
-    'allowed_origins_patterns' => [],
+    'allowed_origins_patterns' => ['*'],
 
     'allowed_headers' => ['Origin', 'Content-Type', 'X-Auth-Token', 'Cookie','Authorization'],
 
