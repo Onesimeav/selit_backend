@@ -19,7 +19,7 @@ return [
 
     'allowed_methods' => ['GET', 'POST', 'PUT', 'OPTIONS','DELETE'],
 
-    'allowed_origins' => ['*.selit.store','selit.store','sandiego.selit.store','*.localhost:5173','localhost:5173','sandiego.localhost:5173'],
+    'allowed_origins' => ['*'],
 
     'allowed_origins_patterns' => ['*'],
 
