@@ -23,9 +23,9 @@ return [
 
     'allowed_origins_patterns' => ['*'],
 
-    'allowed_headers' => ['Origin', 'Content-Type', 'X-Auth-Token', 'Cookie','Authorization'],
+    'allowed_headers' => ['*'],
 
-    'exposed_headers' => ['Access-Control-Allow-Origin'],
+    'exposed_headers' => [],
 
     'max_age' => 0,
 
