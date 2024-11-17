@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Enums\OrderStatusEnum;
 use App\Http\Requests\Order\CancelOrderRequest;
+use App\Http\Requests\Order\GetOrderRequest;
 use App\Http\Requests\Order\OrderRequest;
 use App\Http\Requests\Order\OrderSearchRequest;
 use App\Http\Requests\Order\setOrderStateAsDeliveryRequest;
@@ -89,10 +90,11 @@ class OrderController extends Controller
         $orderProducts=$order->products()->get();
         $orderProductsData=[];
         foreach ($orderProducts as $orderProduct) {
-            $orderProductPromotions=$orderProduct->pivot->promotions()->get()->toArray();
+            $orderProductPromotions=OrderProduct::findOrFail($orderProduct->pivot->id);
+            $orderProductPromotionCodes=$orderProductPromotions->promotions()->get()->toArray();
             $promotionCodes=[];
-            foreach ($orderProductPromotions as $orderProductPromotion){
-                $promotionCodes[]=$orderProductPromotion['pivot']['code'];
+            foreach ($orderProductPromotionCodes as $orderProductPromotionCode){
+                $promotionCodes[]=$orderProductPromotionCode['pivot']['code'];
             }
             $orderProduct = $orderProduct->pivot->toArray();
             $orderProduct['promotion_code']=$promotionCodes;
@@ -125,6 +127,20 @@ class OrderController extends Controller
             'message'=>'The user does not own this shop'
         ],403);
     }
+
+    public function getOrder(GetOrderRequest $request): JsonResponse
+    {
+        $orders = Order::whereIn('id',$request->input('id'))->get()->toArray();
+        if ($orders!=null){
+            return response()->json([
+                'orders'=>$orders
+            ]);
+        }
+        return response()->json([
+            'message'=>'No order retrieved'
+        ],400);
+    }
+
     public function setOrderStateAsApproved(ShopOwnershipService $shopOwnershipService, $orderId): JsonResponse
     {
         $order=Order::findOrFail($orderId);
@@ -137,10 +153,11 @@ class OrderController extends Controller
             $orderProducts=$order->products()->get();
             $orderProductsData=[];
             foreach ($orderProducts as $orderProduct) {
-                $orderProductPromotions=$orderProduct->pivot->promotions()->get()->toArray();
+                $orderProductPromotions=OrderProduct::findOrFail($orderProduct->pivot->id);
+                $orderProductPromotionCodes=$orderProductPromotions->promotions()->get()->toArray();
                 $promotionCodes=[];
-                foreach ($orderProductPromotions as $orderProductPromotion){
-                    $promotionCodes[]=$orderProductPromotion['pivot']['code'];
+                foreach ($orderProductPromotionCodes as $orderProductPromotionCode){
+                    $promotionCodes[]=$orderProductPromotionCode['pivot']['code'];
                 }
                 $orderProduct = $orderProduct->pivot->toArray();
                 $orderProduct['promotion_code']=$promotionCodes;
@@ -171,10 +188,11 @@ class OrderController extends Controller
             $orderProducts=$order->products()->get();
             $orderProductsData=[];
             foreach ($orderProducts as $orderProduct) {
-                $orderProductPromotions=$orderProduct->pivot->promotions()->get()->toArray();
+                $orderProductPromotions=OrderProduct::findOrFail($orderProduct->pivot->id);
+                $orderProductPromotionCodes=$orderProductPromotions->promotions()->get()->toArray();
                 $promotionCodes=[];
-                foreach ($orderProductPromotions as $orderProductPromotion){
-                    $promotionCodes[]=$orderProductPromotion['pivot']['code'];
+                foreach ($orderProductPromotionCodes as $orderProductPromotionCode){
+                    $promotionCodes[]=$orderProductPromotionCode['pivot']['code'];
                 }
                 $orderProduct = $orderProduct->pivot->toArray();
                 $orderProduct['promotion_code']=$promotionCodes;
@@ -220,10 +238,11 @@ class OrderController extends Controller
             $orderProducts=$order->products()->get();
             $orderProductsData=[];
             foreach ($orderProducts as $orderProduct) {
-                $orderProductPromotions=$orderProduct->pivot->promotions()->get()->toArray();
+                $orderProductPromotions=OrderProduct::findOrFail($orderProduct->pivot->id);
+                $orderProductPromotionCodes=$orderProductPromotions->promotions()->get()->toArray();
                 $promotionCodes=[];
-                foreach ($orderProductPromotions as $orderProductPromotion){
-                    $promotionCodes[]=$orderProductPromotion['pivot']['code'];
+                foreach ($orderProductPromotionCodes as $orderProductPromotionCode){
+                    $promotionCodes[]=$orderProductPromotionCode['pivot']['code'];
                 }
                 $orderProduct = $orderProduct->pivot->toArray();
                 $orderProduct['promotion_code']=$promotionCodes;
@@ -275,10 +294,11 @@ class OrderController extends Controller
                 $orderProducts=$order->products()->get();
                 $orderProductsData=[];
                 foreach ($orderProducts as $orderProduct) {
-                    $orderProductPromotions=$orderProduct->promotions()->get()->toArray();
+                    $orderProductPromotions=OrderProduct::findOrFail($orderProduct->pivot->id);
+                    $orderProductPromotionCodes=$orderProductPromotions->promotions()->get()->toArray();
                     $promotionCodes=[];
-                    foreach ($orderProductPromotions as $orderProductPromotion){
-                        $promotionCodes[]=$orderProductPromotion['pivot']['code'];
+                    foreach ($orderProductPromotionCodes as $orderProductPromotionCode){
+                        $promotionCodes[]=$orderProductPromotionCode['pivot']['code'];
                     }
                     $orderProduct = $orderProduct->pivot->toArray();
                     $orderProduct['promotion_code']=$promotionCodes;
@@ -324,10 +344,11 @@ class OrderController extends Controller
                 $orderProducts=$order->products()->get();
                 $orderProductsData=[];
                 foreach ($orderProducts as $orderProduct) {
-                    $orderProductPromotions=$orderProduct->promotions()->get()->toArray();
+                    $orderProductPromotions=OrderProduct::findOrFail($orderProduct->pivot->id);
+                    $orderProductPromotionCodes=$orderProductPromotions->promotions()->get()->toArray();
                     $promotionCodes=[];
-                    foreach ($orderProductPromotions as $orderProductPromotion){
-                        $promotionCodes[]=$orderProductPromotion['pivot']['code'];
+                    foreach ($orderProductPromotionCodes as $orderProductPromotionCode){
+                        $promotionCodes[]=$orderProductPromotionCode['pivot']['code'];
                     }
                     $orderProduct = $orderProduct->pivot->toArray();
                     $orderProduct['promotion_code']=$promotionCodes;

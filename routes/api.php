@@ -21,6 +21,7 @@ Route::post('/forgot-password', [UserAuthenticationController::class, 'forgotPas
 Route::post('/reset-password', [UserAuthenticationController::class, 'verifyPasswordCode']);
 //orders
 Route::post('/orders', [OrderController::class, 'createOrder']);
+Route::get('orders/get-orders',[OrderController::class, 'getOrder']);
 Route::put('/orders/finish-order', [OrderController::class, 'setOrderStateAsFinished']);
 Route::put('/orders/cancel-order', [OrderController::class, 'cancelOrder']);
 Route::put('orders/delivered-order/{orderReference}', [OrderController::class, 'setOrderStateAsDelivered']);

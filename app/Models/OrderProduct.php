@@ -57,6 +57,6 @@ class OrderProduct extends Pivot
 
     public function promotions()
     {
-        return $this->belongsToMany(Promotion::class)->using(OrderProductPromotion::class)->withPivot('code');
+        return $this->belongsToMany(Promotion::class,'order_product_promotion','order_id')->using(OrderProductPromotion::class)->withPivot('code');
     }
 }
