@@ -130,7 +130,7 @@ class OrderController extends Controller
 
     public function getOrder(GetOrderRequest $request): JsonResponse
     {
-        $orders = Order::whereIn('id',$request->input('id'))->get()->toArray();
+        $orders = Order::whereIn('id',$request->input('ordersIds'))->get()->toArray();
         if ($orders!=null){
             return response()->json([
                 'orders'=>$orders
