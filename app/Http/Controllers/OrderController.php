@@ -149,8 +149,7 @@ class OrderController extends Controller
                 }
                 $orderDetails=$order->toArray();
                 $orderDetails['orderProducts']=$orderProductsData;
-                $orderData[]=$orderDetails;
-                $ordersData[]=$orderData;
+                $ordersData[]=$orderDetails;
             }
             return response()->json([
                 'orders'=>$ordersData
