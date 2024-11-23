@@ -130,16 +130,36 @@ class OrderController extends Controller
 
     public function getOrder(GetOrderRequest $request): JsonResponse
     {
-        $orders = Order::whereIn('id',$request->input('ordersIds'))->get()->toArray();
+        $orders = Order::whereIn('id',$request->input('ordersIds'))->get();
         if ($orders!=null){
+            $ordersData=[];
+            foreach ($orders as $order){
+                $orderProducts=$order->products()->get();
+                $orderProductsData=[];
+                foreach ($orderProducts as $orderProduct) {
+                    $orderProductPromotions=OrderProduct::findOrFail($orderProduct->pivot->id);
+                    $orderProductPromotionCodes=$orderProductPromotions->promotions()->get()->toArray();
+                    $promotionCodes=[];
+                    foreach ($orderProductPromotionCodes as $orderProductPromotionCode){
+                        $promotionCodes[]=$orderProductPromotionCode['pivot']['code'];
+                    }
+                    $orderProduct = $orderProduct->pivot->toArray();
+                    $orderProduct['promotion_code']=$promotionCodes;
+                    $orderProductsData[]=$orderProduct;
+                }
+                $orderData[]=$order;
+                $orderData['orderProducts']=$orderProductsData;
+                $ordersData[]=$orderData;
+            }
             return response()->json([
-                'orders'=>$orders
+                'orders'=>$ordersData
             ]);
         }
         return response()->json([
             'message'=>'No order retrieved'
         ],400);
     }
+
 
     public function setOrderStateAsApproved(ShopOwnershipService $shopOwnershipService, $orderId): JsonResponse
     {
