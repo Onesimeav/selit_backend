@@ -147,8 +147,9 @@ class OrderController extends Controller
                     $orderProduct['promotion_code']=$promotionCodes;
                     $orderProductsData[]=$orderProduct;
                 }
-                $orderData[]=$order;
-                $orderData['orderProducts']=$orderProductsData;
+                $orderDetails=$order->toArray();
+                $orderDetails['orderProducts']=$orderProductsData;
+                $orderData[]=$orderDetails;
                 $ordersData[]=$orderData;
             }
             return response()->json([
