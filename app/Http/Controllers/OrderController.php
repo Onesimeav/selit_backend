@@ -184,7 +184,7 @@ class OrderController extends Controller
                 $orderProduct['promotion_code']=$promotionCodes;
                 $orderProductsData[]=$orderProduct;
             }
-            broadcast(new SendOrderStatus($orderId,OrderStatusEnum::APPROVED->value))->toOthers();
+            event(new SendOrderStatus($orderId,OrderStatusEnum::APPROVED->value));
             Mail::to($order->email)->send(new \App\Mail\Customer\SendApprovedOrderMail($shop->name,"$order->name $order->surname",$order->order_reference,$orderProductsData));
 
             return response()->json([

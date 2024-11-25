@@ -37,8 +37,4 @@ class SendOrderStatus implements ShouldBroadcast
         return 'order-status-change';
     }
 
-    public function broadcastWith()
-    {
-        return ['status'=>$this->orderStatus];
-    }
 }
