@@ -10,10 +10,12 @@
         "cloudinary-labs/cloudinary-laravel": "^2.2",
         "kkiapay/kkiapay-php": "dev-master",
         "laravel/framework": "^11.9",
+        "laravel/reverb": "^1.0",
         "laravel/sanctum": "^4.0",
         "laravel/socialite": "^5.15",
         "laravel/tinker": "^2.9",
         "nextapps/laravel-verification-code": "^2.1",
+        "pusher/pusher-php-server": "^7.2",
         "rakutentech/laravel-request-docs": "^2.41"
     },
     "require-dev": {
