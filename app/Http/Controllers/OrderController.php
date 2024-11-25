@@ -220,6 +220,7 @@ class OrderController extends Controller
                 $orderProduct['promotion_code']=$promotionCodes;
                 $orderProductsData[]=$orderProduct;
             }
+            event(new SendOrderStatus($order->id,OrderStatusEnum::DELIVERY->value));
             Mail::to($order->email)->send(new \App\Mail\Customer\SendOrderDeliveryMail($shop->name,"$order->name $order->surname",$order->order_reference,$orderProductsData));
             Mail::to($request->input('deliveryman_email'))->send(new \App\Mail\DeliveryMan\SendOrderDeliveryMail($deliveryLink));
             return response()->json([
@@ -270,6 +271,9 @@ class OrderController extends Controller
                 $orderProduct['promotion_code']=$promotionCodes;
                 $orderProductsData[]=$orderProduct;
             }
+
+            event(new SendOrderStatus($order->id,OrderStatusEnum::DELIVERED->value));
+
             Mail::to($order->email)->send(new \App\Mail\Customer\SendOrderDeliveredMail($shop->name,"$order->name $order->surname",$orderReference,$orderProductsData));
             Mail::to($shopOwner->email)->send(new \App\Mail\Seller\SendOrderDeliveredMail($shop->name,$shopOwner->name,$orderReference,$orderProductsData));
 
@@ -329,6 +333,8 @@ class OrderController extends Controller
 
                 //generate order invoice
                 $pdf = Pdf::loadView('order.invoice', ['customerName'=>"$order->name $order->surname", 'shopName'=>$shop->name, 'orderProducts'=>$orderProductsData, 'orderPrice'=>$orderPrice, 'orderReference'=>$request->input('order_reference')]);
+
+                event(new SendOrderStatus($order->id,OrderStatusEnum::FINISHED->value));
 
                 Mail::to($order->email)->send(new \App\Mail\Customer\SendFinishedOrderMail($shop->name,"$order->name $order->surname",$order->order_reference,$orderProductsData,$order->invoice,$pdf));
                 Mail::to($user->email)->send(new \App\Mail\Seller\SendFinishedOrderMail($shop->name,$user->name,$order->order_reference,$orderProductsData,$pdf));
@@ -406,6 +412,8 @@ class OrderController extends Controller
                 $order->status=OrderStatusEnum::CANCELED;
                 $order->save();
                 $shop=Shop::findOrFail($order->shop_id);
+
+                event(new SendOrderStatus($order->id,OrderStatusEnum::CANCELED->value));
                 Mail::to($order->email)->send(new \App\Mail\Customer\SendCancelledOrderMail($shop->name,"$order->name $order->surname",$request->input('order_reference')));
                 return response()->json([
                     'message'=>'Order cancelled successfully',
@@ -418,6 +426,8 @@ class OrderController extends Controller
                     $order->save();
                     $shop=Shop::findOrFail($order->shop_id);
                     $user = User::findOrFail($shop->owner_id);
+
+                    event(new SendOrderStatus($order->id,OrderStatusEnum::CANCELED->value));
                     Mail::to($user->email)->send(new \App\Mail\Seller\SendCancelledOrderMail($user->name,$request->input('order_reference')));
                     return response()->json([
                         'message'=>'Order cancelled successfully',
