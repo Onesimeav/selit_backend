@@ -131,35 +131,39 @@ class OrderController extends Controller
 
     public function getOrder(GetOrderRequest $request): JsonResponse
     {
-        $orders = Order::whereIn('id',$request->input('ordersIds'))->get();
-        if ($orders!=null){
-            $ordersData=[];
-            foreach ($orders as $order){
-                $orderProducts=$order->products()->get();
-                $orderProductsData=[];
-                foreach ($orderProducts as $orderProduct) {
-                    $orderProductPromotions=OrderProduct::findOrFail($orderProduct->pivot->id);
-                    $orderProductPromotionCodes=$orderProductPromotions->promotions()->get()->toArray();
-                    $promotionCodes=[];
-                    foreach ($orderProductPromotionCodes as $orderProductPromotionCode){
-                        $promotionCodes[]=$orderProductPromotionCode['pivot']['code'];
-                    }
-                    $orderProduct = $orderProduct->pivot->toArray();
-                    $orderProduct['promotion_code']=$promotionCodes;
-                    $orderProductsData[]=$orderProduct;
-                }
-                $orderDetails=$order->toArray();
-                $orderDetails['orderProducts']=$orderProductsData;
-                $ordersData[]=$orderDetails;
-            }
+        $orders = Order::whereIn('id', $request->input('ordersIds'))->get();
+
+        if ($orders->isEmpty()) {
             return response()->json([
-                'orders'=>$ordersData
-            ]);
+                'message' => 'No order retrieved'
+            ], 400);
         }
+
+        $ordersData = $orders->map(function($order) {
+            $orderProducts = $order->products()->get()->map(function($orderProduct) {
+                $orderProductPromotions = OrderProduct::findOrFail($orderProduct->pivot->id);
+                $orderProductPromotionCodes = $orderProductPromotions->promotions()->get()->toArray();
+                $promotionCodes = array_map(function($promotion) {
+                    return $promotion['pivot']['code'];
+                }, $orderProductPromotionCodes);
+
+                $orderProductData = $orderProduct->pivot->toArray();
+                $orderProductData['promotion_code'] = $promotionCodes;
+
+                return $orderProductData;
+            });
+
+            $orderDetails = $order->toArray();
+            $orderDetails['orderProducts'] = $orderProducts->toArray();
+
+            return $orderDetails;
+        });
+
         return response()->json([
-            'message'=>'No order retrieved'
-        ],400);
+            'orders' => $ordersData
+        ]);
     }
+
 
 
     public function setOrderStateAsApproved(ShopOwnershipService $shopOwnershipService, $orderId): JsonResponse
