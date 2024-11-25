@@ -11,6 +11,9 @@ php artisan route:cache
 echo "Running migrations..."
 php artisan migrate --force
 
+echo "Starting the queue listener..."
+php artisan queue:listen &
+
 echo "Start the queue worker..."
 php artisan queue:work --daemon &
 
