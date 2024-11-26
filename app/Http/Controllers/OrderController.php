@@ -294,7 +294,7 @@ class OrderController extends Controller
 
     public function setOrderStateAsFinished(VerifyOrderTransactionRequest $request): JsonResponse
     {
-        $order = Order::firstWhere('order_reference',$request->input('order_reference'))->first();
+        $order = Order::firstWhere('order_reference',$request->input('order_reference'));
 
         if ($order!=null)
         {
@@ -304,13 +304,14 @@ class OrderController extends Controller
             $kkiapay = new Kkiapay($public_key, $private_key, $secret, sandbox:true);
 
             $result = $kkiapay->verifyTransaction($request->input('transaction_id'));
-
             $orderPrice =0;
             $orderProducts=$order->products()->get();
+
             foreach ($orderProducts as $orderProduct) {
                 $orderPrice+= ($orderProduct->pivot->price_promotion_applied*$orderProduct->pivot->product_quantity);
             }
-            if ($result->status=="SUCCESS"&& $result->amount==$orderPrice)
+
+            if ($result->status=="SUCCESS" && $result->amount==$orderPrice)
             {
                 //update user balance
                 $shop=Shop::findOrFail($order->shop_id);
