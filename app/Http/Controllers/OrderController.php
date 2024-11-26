@@ -341,7 +341,7 @@ class OrderController extends Controller
 
                 event(new SendOrderStatus($order->id,OrderStatusEnum::FINISHED->value));
 
-                Mail::to($order->email)->send(new \App\Mail\Customer\SendFinishedOrderMail($shop->name,"$order->name $order->surname",$order->order_reference,$orderProductsData,$order->invoice,$pdf));
+                Mail::to($order->email)->send(new \App\Mail\Customer\SendFinishedOrderMail($shop->name,"$order->name $order->surname",$order->order_reference,$orderProductsData,$pdf));
                 Mail::to($user->email)->send(new \App\Mail\Seller\SendFinishedOrderMail($shop->name,$user->name,$order->order_reference,$orderProductsData,$pdf));
 
                 return response()->json([
