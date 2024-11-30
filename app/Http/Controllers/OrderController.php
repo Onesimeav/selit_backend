@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Enums\OrderStatusEnum;
 use App\Events\SendOrderStatus;
 use App\Http\Requests\Order\CancelOrderRequest;
+use App\Http\Requests\Order\GetDeliveryDetailsRequest;
 use App\Http\Requests\Order\GetOrderRequest;
 use App\Http\Requests\Order\OrderRequest;
 use App\Http\Requests\Order\OrderSearchRequest;
@@ -37,7 +38,9 @@ class OrderController extends Controller
             'surname'=>$request->input('surname'),
             'email'=>$request->input('email'),
             'number'=>$request->input('number'),
-            'location'=>'location',
+            'address'=>$request->input('address'),
+            'location_latitude'=>$request->input('location_latitude'),
+            'location_longitude'=>$request->input('location_longitude'),
             'status'=>OrderStatusEnum::PENDING,
             'secret'=>mt_rand(100000, 999999),
             'shop_id'=>$shop->id,
@@ -131,7 +134,9 @@ class OrderController extends Controller
 
     public function getOrder(GetOrderRequest $request): JsonResponse
     {
-        $orders = Order::whereIn('id', $request->input('ordersIds'))->get();
+        $orders = Order::whereIn('id', $request->input('ordersIds'))
+                        ->where('shop_id',$request->input('shop_id'))
+                        ->get();
 
         if ($orders->isEmpty()) {
             return response()->json([
@@ -207,10 +212,15 @@ class OrderController extends Controller
         if ($shopOwnershipService->isShopOwner($order->shop_id))
         {
             $order->status=OrderStatusEnum::DELIVERY;
+            $order->deliveryman_mail=$request->input('deliveryman_email');
+            $order->deliveryman_name=$request->input('deliveryman_name');
+            $order->deliveryman_surname=$request->input('deliveryman_surname');
+            $order->deliveryman_number=$request->input('deliveryman_number');
             $order->save();
 
-            $deliveryLink = "https://www.selit.store/order/delivery/$order->order_reference";
             $shop = Shop::findOrFail($order->shop_id);
+            $deliveryLink = "https://www.$shop->subdomain.selit.store/delivery/$order->order_reference";
+
             $orderProducts=$order->products()->get();
             $orderProductsData=[];
             foreach ($orderProducts as $orderProduct) {
@@ -238,17 +248,45 @@ class OrderController extends Controller
         ],403);
     }
 
-    public function getDeliveryDetails($orderReference)
+    public function getDeliveryDetails(GetDeliveryDetailsRequest $request): JsonResponse
     {
-        $order=Order::where('order_reference',$orderReference)->get();
+        $order=Order::where('order_reference',$request->input('order_reference'))
+                        ->where('shop_id',$request->input('shop_id'))
+                        ->where('status','like',OrderStatusEnum::DELIVERY)
+                        ->get();
 
         if ($order!=null)
         {
-            $orderData = $order->toArray();
-            return view('delivery.delivery-details', compact('orderData'));
+            return response()->json([
+                'order'=>$order->toArray(),
+            ]);
         }
 
-        return view('template.404');
+        return response()->json([
+            'message'=>'The order does not exist on this shop',
+        ],400);
+    }
+
+    public function getDeliverymanInfo(GetDeliveryDetailsRequest $request): JsonResponse
+    {
+        $order=Order::where('order_reference',$request->input('order_reference'))
+            ->where('shop_id',$request->input('shop_id'))
+            ->where('status','like',OrderStatusEnum::DELIVERY)
+            ->get();
+
+        if ($order!=null)
+        {
+            return response()->json([
+                'name'=>$order->deliveryman_name,
+                'surname'=>$order->deliveryman_surname,
+                'email'=>$order->deliveryman_mail,
+                'number'=>$order->deliveryman_number,
+            ]);
+        }
+
+        return response()->json([
+            'message'=>'The order does not exist on this shop',
+        ],400);
     }
 
     public function setOrderStateAsDelivered($orderReference): JsonResponse

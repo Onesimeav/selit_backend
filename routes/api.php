@@ -22,6 +22,8 @@ Route::post('/reset-password', [UserAuthenticationController::class, 'verifyPass
 //orders
 Route::post('/orders', [OrderController::class, 'createOrder']);
 Route::get('orders/get-orders',[OrderController::class, 'getOrder']);
+Route::get('/orders/get-delivery-info',[OrderController::class,'getDeliveryDetails']);
+Route::get('/orders/get-deliveryman-info',[OrderController::class,'getDeliverymanInfo']);
 Route::put('/orders/finish-order', [OrderController::class, 'setOrderStateAsFinished']);
 Route::put('/orders/cancel-order', [OrderController::class, 'cancelOrder']);
 Route::put('orders/delivered-order/{orderReference}', [OrderController::class, 'setOrderStateAsDelivered']);

@@ -24,6 +24,7 @@ class GetOrderRequest extends FormRequest
         return [
             'ordersIds'=>'required|array',
             'ordersIds.*'=>'required|integer',
+            'shop_id'=>'required|integer',
         ];
     }
 }

@@ -52,9 +52,15 @@ class Order extends Model
         'surname',
         'email',
         'number',
-        'location',
+        'address',
+        'location_latitude',
+        'location_longitude',
         'status',
         'secret',
+        'deliveryman_mail',
+        'deliveryman_name',
+        'deliveryman_surname',
+        'deliveryman_number',
         'shop_id',
     ];
 

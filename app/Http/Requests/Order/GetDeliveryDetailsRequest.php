@@ -4,14 +4,14 @@ namespace App\Http\Requests\Order;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class setOrderStateAsDeliveryRequest extends FormRequest
+class GetDeliveryDetailsRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return true;
+        return false;
     }
 
     /**
@@ -22,11 +22,8 @@ class setOrderStateAsDeliveryRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'order_id'=>'required|integer',
-            'deliveryman_email'=>'required|string|lowercase|email|max:255',
-            'deliveryman_name'=>'required|string',
-            'deliveryman_surname'=>'required|string',
-            'deliveryman_number'=>'required|integer'
+            'order_reference'=>'required|string',
+            'shop_id'=>'required|integer',
         ];
     }
 }
