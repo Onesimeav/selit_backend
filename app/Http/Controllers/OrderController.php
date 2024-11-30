@@ -253,7 +253,7 @@ class OrderController extends Controller
         $order=Order::where('order_reference',$request->input('order_reference'))
                         ->where('shop_id',$request->input('shop_id'))
                         ->where('status','like',OrderStatusEnum::DELIVERY)
-                        ->get();
+                        ->first();
 
         if ($order!=null)
         {
@@ -271,8 +271,8 @@ class OrderController extends Controller
     {
         $order=Order::where('order_reference',$request->input('order_reference'))
             ->where('shop_id',$request->input('shop_id'))
-            ->where('status','like',OrderStatusEnum::DELIVERY)
-            ->get();
+            ->where('status',OrderStatusEnum::DELIVERY->value)
+            ->first();
 
         if ($order!=null)
         {
