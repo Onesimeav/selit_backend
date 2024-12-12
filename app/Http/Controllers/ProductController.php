@@ -124,7 +124,8 @@ class ProductController extends Controller
         }
 
         $searchResult = Product::where('name','like',"%$keyword%")
-            ->where('shop_id',$shop->id);
+            ->where('shop_id',$shop->id)
+            ->paginate(15);
 
         return  response()->json([
             'result'=>$searchResult->toArray(),
