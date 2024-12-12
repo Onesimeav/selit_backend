@@ -37,6 +37,7 @@ Route::get('/subdomain/{domain}/get-categories', [SubdomainController::class, 'g
 Route::get('/subdomain/{domain}/category/{id}/products', [SubdomainController::class, 'getShopCategoryProducts']);
 //products
 Route::get('/products/get-product/{id}',[ProductController::class,'getProduct']);
+Route::get('/products/search-product',[ProductController::class,'searchProductFromShop']);
 
 //only logged-in users
 Route::middleware('auth:sanctum')->group(function () {

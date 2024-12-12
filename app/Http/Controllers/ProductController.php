@@ -9,9 +9,12 @@ use App\Http\Requests\Product\DeleteMediaFromProductRequest;
 use App\Http\Requests\Product\deleteProductSpecifiactionsRequest;
 use App\Http\Requests\Product\ProductRequest;
 use App\Http\Requests\Product\ProductUpdateRequest;
+use App\Http\Requests\Product\SearchProductFromShopRequest;
 use App\Http\Requests\Product\UpdateProductSpecificationRequest;
+use App\Models\Category;
 use App\Models\Media;
 use App\Models\Product;
+use App\Models\Shop;
 use App\Models\Specification;
 use App\Services\ProductOwnershipService;
 use App\Services\ShopOwnershipService;
@@ -104,6 +107,27 @@ class ProductController extends Controller
 
         return response()->json([
             'result'=>$products,
+        ]);
+    }
+
+    public function searchProductFromShop( SearchProductFromShopRequest $request): JsonResponse
+    {
+        $shop = Shop::findOrFail($request->input('shop_id'));
+        $keyword=$request->input('keyword');
+        if ($request->filled('category_id')){
+            $category = Category::findOrFail($request->input('category_id'));
+            $searchResult = $category->products()->where('name','like',"%$keyword%")->paginate(15);
+
+            return response()->json([
+                'result'=>$searchResult->toArray(),
+            ]);
+        }
+
+        $searchResult = Product::where('name','like',"%$keyword%")
+            ->where('shop_id',$shop->id);
+
+        return  response()->json([
+            'result'=>$searchResult->toArray(),
         ]);
     }
 
