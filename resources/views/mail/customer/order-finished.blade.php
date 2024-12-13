@@ -34,9 +34,6 @@
     @endif
 </ul>
 
-<p>To download your invoice, please click the link below:</p>
-<p><a href="{{$invoiceLink}}">Download Invoice</a></p>
-
 <p>If you have any questions or need further assistance, feel free to reach out.</p>
 
 <p>Thank you for choosing our service!</p>

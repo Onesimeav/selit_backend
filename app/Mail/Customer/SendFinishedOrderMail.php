@@ -18,7 +18,7 @@ class SendFinishedOrderMail extends Mailable implements ShouldQueue
     /**
      * Create a new message instance.
      */
-    public function __construct(public string $shopName, public string $customerName, public string $orderReference, public  array $orderProducts, public $pdf)
+    public function __construct(public string $shopName, public string $customerName, public string $orderReference, public  array $orderProducts, public string $pdf)
     {
     }
 
@@ -51,7 +51,7 @@ class SendFinishedOrderMail extends Mailable implements ShouldQueue
     public function attachments(): array
     {
         return [
-            Attachment::fromData(fn()=> $this->pdf->output(), "$this->orderReference.pdf")
+            Attachment::fromData(fn()=> base64_decode($this->pdf) , "$this->orderReference.pdf")
                     ->withMime('application/pdf'),
         ];
     }

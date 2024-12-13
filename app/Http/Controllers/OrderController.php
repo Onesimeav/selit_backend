@@ -219,7 +219,7 @@ class OrderController extends Controller
             $order->save();
 
             $shop = Shop::findOrFail($order->shop_id);
-            $deliveryLink = "https://www.$shop->subdomain.selit.store/delivery/$order->order_reference";
+            $deliveryLink = "https://$shop->subdomain.selit.store/order/delivery/$order->order_reference";
 
             $orderProducts=$order->products()->get();
             $orderProductsData=[];
@@ -376,11 +376,11 @@ class OrderController extends Controller
 
                 //generate order invoice
                 $pdf = Pdf::loadView('order.invoice', ['customerName'=>"$order->name $order->surname", 'shopName'=>$shop->name, 'orderProducts'=>$orderProductsData, 'orderPrice'=>$orderPrice, 'orderReference'=>$request->input('order_reference')]);
-
+                $pdfContent = base64_encode($pdf->output());
                 event(new SendOrderStatus($order->id,OrderStatusEnum::FINISHED->value));
 
-                Mail::to($order->email)->send(new \App\Mail\Customer\SendFinishedOrderMail($shop->name,"$order->name $order->surname",$order->order_reference,$orderProductsData,$pdf));
-                Mail::to($user->email)->send(new \App\Mail\Seller\SendFinishedOrderMail($shop->name,$user->name,$order->order_reference,$orderProductsData,$pdf));
+                Mail::to($order->email)->send(new \App\Mail\Customer\SendFinishedOrderMail($shop->name,"$order->name $order->surname",$order->order_reference,$orderProductsData,$pdfContent));
+                Mail::to($user->email)->send(new \App\Mail\Seller\SendFinishedOrderMail($shop->name,$user->name,$order->order_reference,$orderProductsData,$pdfContent));
 
                 return response()->json([
                     'message'=>'The order was successfully verified'
