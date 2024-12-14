@@ -10,6 +10,13 @@ use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
+    public  function getUser(): JsonResponse
+    {
+        $user = User::findOrFail(Auth::id());
+        return response()->json([
+            'user'=>$user->toArray(),
+        ]);
+    }
     public function getBalance(): JsonResponse
     {
         $user = User::findOrFail(Auth::id());
