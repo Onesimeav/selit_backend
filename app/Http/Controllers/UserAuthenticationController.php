@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Laravel\Socialite\Facades\Socialite;
 use NextApps\VerificationCode\VerificationCode;
+use Request;
 
 class UserAuthenticationController extends Controller
 {
@@ -112,7 +113,7 @@ class UserAuthenticationController extends Controller
         ]);
     }
 
-    public function handleGoogleAuthCallback(): JsonResponse
+    public function handleGoogleAuthCallback(Request $request): JsonResponse
     {
         try {
             $socialiteUser = Socialite::driver('google')->stateless()->user();
