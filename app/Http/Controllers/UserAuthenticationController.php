@@ -161,7 +161,7 @@ class UserAuthenticationController extends Controller
         Mail::to($request->email)->send(new SendCodeResetPassword($codeData->code));
 
         return response()->json([
-            'message'=>'New password sent to the user mail successfully'
+            'message'=>'Password reset code sent to the user mail successfully'
         ]);
     }
 

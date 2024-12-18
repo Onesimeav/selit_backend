@@ -22,7 +22,7 @@ class VerifyPasswordCodeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'code' => 'required|string|exists:reset_code_passwords',
+            'code' => 'required|integer|exists:reset_code_passwords',
             'password' => 'required|string|min:6',
         ];
     }
