@@ -8,6 +8,7 @@ use App\Http\Requests\Shop\ShopCreationRequest;
 use App\Models\Order;
 use App\Models\Shop;
 use App\Models\Template;
+use App\Models\User;
 use App\Services\ShopOwnershipService;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -99,6 +100,22 @@ class ShopController extends Controller
             ]);
         }
         return response()->json([],403);
+    }
+
+    public function getUserShops()
+    {
+        $shop = Shop::where('owner_id',Auth::id())->get();
+
+        if ($shop){
+            return response()->json([
+                'message'=>'Shop retrieved successfully',
+                'shop'=>$shop->toArray(),
+            ]);
+        }
+
+        return response()->json([
+            'message'=>'The user does not have any shop'
+        ]);
     }
 
 

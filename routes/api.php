@@ -53,6 +53,7 @@ Route::middleware(['auth:sanctum','verified'])->group(function () {
     Route::get('/users/get-balance',[UserController::class,'getBalance']);
     Route::post('/users/withdraw-request',[UserController::class,'makeWithdrawal']);
     //shop
+    Route::get('/shops',[ShopController::class,'getUserShops']);
     Route::post('/shops',[ShopController::class,'createShop']);
     Route::post('/shops/choose-shop-template',[ShopController::class,'chooseTemplate']);
     Route::post('/shops/add-product-to-shop',[ProductController::class,'addToShop']);
