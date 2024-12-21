@@ -10,6 +10,7 @@ use App\Http\Requests\Product\deleteProductSpecifiactionsRequest;
 use App\Http\Requests\Product\ProductRequest;
 use App\Http\Requests\Product\ProductUpdateRequest;
 use App\Http\Requests\Product\SearchProductFromShopRequest;
+use App\Http\Requests\Product\SearchProductRequest;
 use App\Http\Requests\Product\UpdateProductSpecificationRequest;
 use App\Models\Category;
 use App\Models\Media;
@@ -23,6 +24,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use function Laravel\Prompts\search;
 use function PHPUnit\Framework\isEmpty;
 
 class ProductController extends Controller
@@ -92,21 +94,25 @@ class ProductController extends Controller
         ],201);
     }
 
-    public function searchProduct(Request $request): JsonResponse
+    public function searchProduct(SearchProductRequest $request,ShopOwnershipService $shopOwnershipService): JsonResponse
     {
-        $search = $request->input('search');
-
-        if ($search!=null){
-            $products = Product::where('name', 'like', "%$search%")
-                ->where('owner_id', Auth::id())
-                ->paginate(15);
-        }else{
-            $products = Product::where('owner_id', Auth::id())
-                ->paginate(15);
+        $products = Product::where('owner_id',Auth::id());
+        if ($request->filled('shop_id')){
+            $shop_id = $request->input('shop_id');
+            if (!$shopOwnershipService->isShopOwner($shop_id)){
+                return response()->json([
+                    'message'=>'The user does not own the shop',
+                ],400);
+            }
+            $products = $products->where('shop_id',$shop_id);
+        }
+        if ($request->filled('search')){
+            $search = $request->input('search');
+            $products = $products->where('name','like',"%$search%");
         }
 
         return response()->json([
-            'result'=>$products,
+            'result'=>$products->paginate('15')->toArray(),
         ]);
     }
 

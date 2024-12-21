@@ -102,7 +102,7 @@ class ShopController extends Controller
         return response()->json([],403);
     }
 
-    public function getUserShops()
+    public function getUserShops(): JsonResponse
     {
         $shop = Shop::where('owner_id',Auth::id())->get();
 
