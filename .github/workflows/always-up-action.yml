@@ -2,7 +2,7 @@ name: Always up github action
 run-name: Always up github action
 on:
   schedule:
-    - cron: '/10 0,5-23 * * *'  # See https://crontab.guru/#/10_0,5-23_*_*_*
+    - cron: '0/10 0,5-23 * * *'  # See https://crontab.guru/#/10_0,5-23_*_*_*
   workflow_dispatch:
 
 jobs:
