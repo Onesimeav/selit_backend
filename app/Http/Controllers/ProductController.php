@@ -6,6 +6,7 @@ use App\Http\Requests\Product\AddMediaToProductRequest;
 use App\Http\Requests\Product\addSpecificationsToProductRequest;
 use App\Http\Requests\Product\AddToShopRequest;
 use App\Http\Requests\Product\DeleteMediaFromProductRequest;
+use App\Http\Requests\Product\DeleteProductRequest;
 use App\Http\Requests\Product\deleteProductSpecifiactionsRequest;
 use App\Http\Requests\Product\ProductRequest;
 use App\Http\Requests\Product\ProductUpdateRequest;
@@ -348,23 +349,29 @@ class ProductController extends Controller
         ],403);
     }
 
-    public function deleteProduct(ProductOwnershipService $productOwnershipService,$id): Response|JsonResponse
+    public function deleteProduct(ProductOwnershipService $productOwnershipService,DeleteProductRequest $request): Response|JsonResponse
     {
-        if ($productOwnershipService->isProductOwner($id))
-        {
-            $product= Product::findOrFail($id);
-            $medias = $product->medias;
-            foreach ($medias as $media) {
-                Cloudinary::destroy($media->public_id);
+        $productsIds = $request->input('products_ids');
+        foreach ($productsIds as $productId){
+            if ($productOwnershipService->isProductOwner($productId))
+            {
+                $product= Product::findOrFail($productId);
+                $medias = $product->medias;
+                foreach ($medias as $media) {
+                    Cloudinary::destroy($media->public_id);
+                }
+
+                $product->categories()->detach();
+                $product->delete();
+
+            }else{
+                return response()->json([
+                    'message'=>'The user does not own this product'
+                ],403);
             }
 
-            $product->categories()->detach();
-            $product->delete();
-            return response()->noContent(204);
         }
-        return response()->json([
-            'message'=>'The user does not own this product'
-        ],403);
+        return response()->noContent(204);
     }
 
 
