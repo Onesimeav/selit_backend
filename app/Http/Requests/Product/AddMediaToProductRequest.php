@@ -23,10 +23,10 @@ class AddMediaToProductRequest extends FormRequest
     {
         return [
             'product_id'=>'required|integer',
-            'videos'=>'required|array',
-            'images'=>'required|array',
-            'images.*' => 'mimes:jpg,png,jpeg|extensions:jpg,png,jpeg',
-            'videos.*' => 'mimes:mp4,mov|extensions:mp4,mov',
+            'videos'=>'array',
+            'images'=>'array',
+            'images.*' => 'mimes:jpg,png,jpeg|extensions:jpg,png,jpeg|required',
+            'videos.*' => 'mimes:mp4,mov|extensions:mp4,mov|required',
         ];
     }
 }

@@ -179,7 +179,7 @@ class ProductController extends Controller
         if ($productOwnershipService->isProductOwner($request->input('product_id')))
         {
             $mediaData=[];
-            if (!isEmpty($request->input('videos')))
+            if ($request->filled('videos'))
             {
                 $videos=$request->file('videos');
                 foreach ( $videos as $video) {
@@ -193,7 +193,7 @@ class ProductController extends Controller
                 }
             }
 
-            if (!isEmpty($request->input('images')))
+            if ($request->filled('images'))
             {
                 $images=$request->file('images');
 
