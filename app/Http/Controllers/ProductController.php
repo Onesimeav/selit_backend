@@ -351,7 +351,7 @@ class ProductController extends Controller
 
     public function deleteProduct(ProductOwnershipService $productOwnershipService,DeleteProductRequest $request): Response|JsonResponse
     {
-        $productsIds = $request->input('products_ids');
+        $productsIds = $request->input('product_ids');
         foreach ($productsIds as $productId){
             if ($productOwnershipService->isProductOwner($productId))
             {
