@@ -232,16 +232,16 @@ class ProductController extends Controller
         if ($productOwnershipService->isProductOwner($request->input('product_id')))
         {
             $product=Product::findOrFail($request->input('product_id'));
-            $medias=$product->medias();
+            $medias=$product->medias;
             $mediasIds=[];
 
             foreach ($medias as $media) {
                 $mediasIds[]=$media->id;
             }
+
             if ($request->filled('medias'))
             {
                 $mediasToDelete=$request->input('medias');
-
                 foreach ($mediasToDelete as $mediaToDelete) {
                     if (in_array($mediaToDelete,$mediasIds))
                     {
@@ -265,12 +265,12 @@ class ProductController extends Controller
         if ($productOwnershipService->isProductOwner($request->input('product_id')))
         {
             $product = Product::findOrFail($request->input('product_id'));
-            $specifications = $product->specifications();
+            $specifications = $product->specifications;
             $specificationsIds=[];
             foreach ($specifications as $specification) {
                 $specificationsIds[]=$specification->id;
             }
-            if (!isEmpty($request->input('specifications')))
+            if ($request->filled('specifications'))
             {
                 $specificationsToUpdate=$request->input('specifications');
                 foreach ($specificationsToUpdate as $specificationToUpdate) {
@@ -324,12 +324,12 @@ class ProductController extends Controller
         if ($productOwnershipService->isProductOwner($request->input('product_id')))
         {
             $product = Product::findOrFail($request->input('product_id'));
-            $specifications = $product->specifications();
+            $specifications = $product->specifications;
             $specificationsIds=[];
             foreach ($specifications as $specification) {
                 $specificationsIds[]=$specification->id;
             }
-            if (!isEmpty($request->input('specifications')))
+            if ($request->filled('specifications'))
             {
                 $specificationsToDelete=$request->input('specifications');
                 foreach ($specificationsToDelete as $specificationToDelete) {

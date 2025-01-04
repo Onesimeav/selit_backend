@@ -24,7 +24,7 @@ class deleteProductSpecifiactionsRequest extends FormRequest
         return [
             'product_id'=>'required|integer',
             'specifications'=>'required|array',
-            'specifications.*'=>'integer',
+            'specifications.*'=>'integer|required',
         ];
     }
 }
