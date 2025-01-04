@@ -238,7 +238,7 @@ class ProductController extends Controller
             foreach ($medias as $media) {
                 $mediasIds[]=$media->id;
             }
-            if (!isEmpty($request->input('medias')))
+            if ($request->filled('medias'))
             {
                 $mediasToDelete=$request->input('medias');
 

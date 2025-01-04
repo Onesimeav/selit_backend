@@ -24,7 +24,7 @@ class DeleteMediaFromProductRequest extends FormRequest
         return [
             'product_id'=>'required|integer',
             'medias'=>'required|array',
-            'medias.*'=>'integer',
+            'medias.*'=>'integer|required',
         ];
     }
 }
