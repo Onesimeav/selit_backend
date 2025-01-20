@@ -64,7 +64,7 @@ Route::middleware(['auth:sanctum','verified'])->group(function () {
     Route::get('/products',[ProductController::class,'searchProduct']);
     Route::put('/products/{id}',[ProductController::class,'updateProduct']);
     Route::delete('/products',[ProductController::class,'deleteProduct']);
-    Route::get('/products/add-media/',[ProductController::class,'addMediaToProduct']);
+    Route::post('/products/add-media/',[ProductController::class,'addMediaToProduct']);
     Route::get('/products/delete-media/',[ProductController::class,'deleteMediaFromProduct']);
     Route::get('/products/update-specification/',[ProductController::class,'updateProductSpecifications']);
     Route::post('/products/add-specification/',[ProductController::class,'addSpecificationsToProduct']);
