@@ -25,7 +25,7 @@ class UpdateProductSpecificationRequest extends FormRequest
             'product_id'=>'required|integer',
             'specifications'=>'required|array',
             'specifications.*.id'=>'required|integer',
-            'specifications.*.value'=>'required|integer',
+            'specifications.*.value'=>'required|string',
             'specifications.*.name'=>'required|string',
         ];
     }
