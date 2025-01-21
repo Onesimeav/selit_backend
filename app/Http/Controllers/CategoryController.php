@@ -11,6 +11,7 @@ use App\Models\Shop;
 use App\Services\ProductOwnershipService;
 use App\Services\ShopOwnershipService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 
 class CategoryController extends Controller
 {
@@ -36,29 +37,37 @@ class CategoryController extends Controller
 
     public function searchCategory(CategorySearchRequest $request,ShopOwnershipService $shopOwnershipService):JsonResponse
     {
-        $shop_id=$request->input('shop_id');
-        $search= $request->input('search');
-
-        if ($shopOwnershipService->isShopOwner($shop_id))
-        {
-            if ($search!=null)
-            {
-                $category=Category::where('name','like',"%$search%")
-                    ->where('shop_id',$shop_id)
-                    ->paginate(15);
-
-            }else{
-                $category=Category::where('shop_id',$shop_id)
-                    ->paginate(15);
+        if ($request->filled('category_id')){
+            $category = Category::findOrFail($request->input('category_id'));
+            if ($shopOwnershipService->isShopOwner($category->shop_id)){
+                return response()->json([
+                    'result'=>$category->toArray(),
+                ]);
             }
+            return response()->json([],403);
+        }
+        $category= Category::where('owner_id', Auth::id());
 
-            return response()->json([
-                'result'=>$category
-            ]);
+        if ($request->filled('shop_id')){
+            if ($shopOwnershipService->isShopOwner($request->input('shop_id'))){
+                $category = $category->where('shop_id',$request->input('shop_id'));
+            }else{
+                return response()->json([],403);
+            }
         }
 
-        return response()->json([],403);
+        if ($request->filled('search')){
+            $search = $request->input('search');
+            $category = $category->where('name', 'like',"%$search%");
+        }
+
+        return response()->json([
+            'result'=>$category->paginate('15')->toArray()
+        ]);
+
     }
+
+
 
     public function updateCategory(CategoryUpdateRequest $request,ShopOwnershipService $shopOwnershipService,$id): JsonResponse
     {
