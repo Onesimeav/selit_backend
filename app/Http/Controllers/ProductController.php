@@ -277,7 +277,8 @@ class ProductController extends Controller
                     {
                         $specification= Specification::findOrFail($specificationToUpdate['id']);
                         $specification->name=$specificationToUpdate['name'];
-                        $specificationToUpdate->value=$specificationsToUpdate['value'];
+                        $specification->value=$specificationsToUpdate['value'];
+                        $specification->save();
                     }
                 }
             }
