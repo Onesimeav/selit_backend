@@ -46,7 +46,13 @@ class CategoryController extends Controller
             }
             return response()->json([],403);
         }
-        $category= Category::where('owner_id', Auth::id());
+
+        $userShops = Shop::where('owner_id',Auth::id());
+        $shopIds =[];
+        foreach ($userShops as $shop){
+            $shopIds[]=$shop->id;
+        }
+        $category= Category::whereIn('shop_id', $shopIds);
 
         if ($request->filled('shop_id')){
             if ($shopOwnershipService->isShopOwner($request->input('shop_id'))){
