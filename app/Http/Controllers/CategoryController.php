@@ -47,7 +47,7 @@ class CategoryController extends Controller
             return response()->json([],403);
         }
 
-        $userShops = Shop::where('owner_id',Auth::id())->get()->toArray();
+        $userShops = Shop::where('owner_id',Auth::id())->get();
         $shopIds =[];
         foreach ($userShops as $shop){
             $shopIds[]=$shop->id;
