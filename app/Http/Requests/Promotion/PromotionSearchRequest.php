@@ -22,7 +22,7 @@ class PromotionSearchRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'shop_id'=>'required|integer',
+            'shop_id'=>'integer',
             'search'=>'string',
         ];
     }

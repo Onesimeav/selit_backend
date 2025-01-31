@@ -8,10 +8,12 @@ use App\Http\Requests\Promotion\PromotionSearchRequest;
 use App\Http\Requests\Promotion\PromotionUpdateRequest;
 use App\Http\Requests\Promotion\VerifyPromotionCodeRequest;
 use App\Models\Promotion;
+use App\Models\Shop;
 use App\Services\ProductOwnershipService;
 use App\Services\ShopOwnershipService;
 use Exception;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
 class PromotionController extends Controller
@@ -67,27 +69,29 @@ class PromotionController extends Controller
 
     public function searchPromotion(PromotionSearchRequest $request, ShopOwnershipService $shopOwnershipService): JsonResponse
     {
-        $shop_id = $request->input('shop_id');
-        if ($shopOwnershipService->isShopOwner($shop_id))
-        {
-            $search = $request->input('search');
-            if ($search!=null)
-            {
-                $result = Promotion::where('name','like',"%$search%")
-                    ->where('shop_id',$shop_id)
-                    ->paginate(15);
-            }else
-            {
-                $result = Promotion::where('shop_id',$shop_id)
-                    ->paginate(15);
-            }
-
-            return response()->json([
-                'result'=>$result,
-            ]);
-
+        $userShops = Shop::where('owner_id',Auth::id())->get();
+        $shopIds =[];
+        foreach ($userShops as $shop){
+            $shopIds[]=$shop->id;
         }
-        return response()->json([],403);
+        $result = Promotion::whereIn('shop_id',$shopIds);
+
+        if ($request->filled('shop_id')){
+            if ($shopOwnershipService->isShopOwner($request->input('shop_id'))){
+                $result = $result->where('shop_id',$request->input('shop_id'));
+            }else{
+                return response()->json([],403);
+            }
+        }
+
+        if ($request->filled('search')){
+            $search = $request->input('search');
+            $result = $result->where('name','like',"%$search%");
+        }
+
+        return response()->json([
+            'result'=>$result->paginate('15')->toArray(),
+        ]);
     }
 
     public function updatePromotion(PromotionUpdateRequest $request,ShopOwnershipService $shopOwnershipService,$id): JsonResponse
