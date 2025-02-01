@@ -129,7 +129,7 @@ class PromotionController extends Controller
                 $active=$request->input('active');
                 if ($active)
                 {
-                    $promotion->active='true';
+                    $promotion->active=$active;
                 }
                 $promotion->save();
 
@@ -256,7 +256,7 @@ class PromotionController extends Controller
         ],404);
     }
 
-    public function getPromotionProducts(int $id, ShopOwnershipService $shopOwnershipService)
+    public function getPromotionProducts(int $id, ShopOwnershipService $shopOwnershipService): JsonResponse
     {
         $promotion = Promotion::findOrFail($id);
 
