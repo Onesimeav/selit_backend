@@ -82,6 +82,7 @@ Route::middleware(['auth:sanctum','verified'])->group(function () {
     Route::get('/promotions',[PromotionController::class,'searchPromotion']);
     Route::put('/promotions/{id}',[PromotionController::class,'updatePromotion']);
     Route::delete('/promotions/{id}',[PromotionController::class,'deletePromotion']);
+    Route::get('/promotions/get-products/{id}',[PromotionController::class,'getPromotionProducts']);
     Route::post('/promotions/add-products',[PromotionController::class,'addProductsToPromotion']);
     Route::post('/promotions/remove-products',[PromotionController::class,'removeProductFromPromotion']);
     //order

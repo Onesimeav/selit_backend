@@ -16,6 +16,9 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
+/*
+ * TODO:Promotion start day should depend on activation date not on creation date
+ * */
 class PromotionController extends Controller
 {
     public function createPromotion(PromotionRequest $request,ShopOwnershipService $shopOwnershipService): JsonResponse
@@ -251,6 +254,27 @@ class PromotionController extends Controller
         return response()->json([
             'message'=>'The promotion does not exist'
         ],404);
+    }
+
+    public function getPromotionProducts(int $id, ShopOwnershipService $shopOwnershipService)
+    {
+        $promotion = Promotion::findOrFail($id);
+
+        if ($promotion!=null){
+            if ($shopOwnershipService->isShopOwner($promotion->shop_id)){
+                $products = $promotion->products()->paginate(15);
+
+                return response()->json([
+                    'products'=>$products,
+                ]);
+            }
+            return response()->json([],403);
+        }
+
+        return response()->json([
+            'message'=>'The promotion does not exist',
+        ],404);
+
     }
 
 }
