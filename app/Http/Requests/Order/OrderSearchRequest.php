@@ -25,7 +25,8 @@ class OrderSearchRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'shop_id'=>'required|integer',
+            'search'=>'string',
+            'shop_id'=>'integer',
             'status'=>[Rule::in(array_column(OrderStatusEnum::cases(), 'value'))],
         ];
     }

@@ -115,21 +115,35 @@ class OrderController extends Controller
 
     public function getOrders(ShopOwnershipService $shopOwnershipService,OrderSearchRequest $request): JsonResponse
     {
-        if ($shopOwnershipService->isShopOwner($request->input('shop_id')))
-        {
-            $result = Order::query()
-                ->where('shop_id',$request->input('shop_id'))
-                ->when($request->filled('status'),fn($q)=>$q->where('status',$request->input('status')))
-                ->paginate(15);
 
-            return response()->json([
-                'result'=>$result,
-            ]);
+        $userShops = Shop::where('owner_id',Auth::id())->get();
+        $shopIds =[];
+        foreach ($userShops as $shop){
+            $shopIds[]=$shop->id;
+        }
+
+        $result = Order::whereIn('shop_id',$shopIds);
+
+        if ($request->filled('shop_id')){
+            if ($shopOwnershipService->isShopOwner($request->input('shop_id'))){
+                $result = $result->where('shop_id',$request->input('shop_id'));
+            }else{
+                return response()->json([],403);
+            }
+        }
+
+        if ($request->filled('search')){
+            $search = $request->input('search');
+            $result= $result->where('order_reference','like',"%$search%");
+        }
+
+        if ($request->filled('status')){
+            $result= $result->where('status',$request->input('status'));
         }
 
         return response()->json([
-            'message'=>'The user does not own this shop'
-        ],403);
+            'result'=>$result->paginate('15'),
+        ]);
     }
 
     public function getOrder(GetOrderRequest $request): JsonResponse
