@@ -149,7 +149,6 @@ class OrderController extends Controller
     public function getOrder(GetOrderRequest $request): JsonResponse
     {
         $orders = Order::whereIn('id', $request->input('ordersIds'))
-                        ->where('shop_id',$request->input('shop_id'))
                         ->get();
 
         if ($orders->isEmpty()) {
