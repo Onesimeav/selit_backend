@@ -128,7 +128,12 @@ class PromotionController extends Controller
                 }
                 if ($request->filled('active'))
                 {
-                    $promotion->active=$request->input('active');
+                    $active = $request->input('active');
+                    if ($active){
+                        $promotion->active='true';
+                    }else{
+                        $promotion->active='false';
+                    }
                 }
                 $promotion->save();
 
