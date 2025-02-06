@@ -284,7 +284,7 @@ class OrderController extends Controller
     {
         $order=Order::where('order_reference',$request->input('order_reference'))
             ->where('shop_id',$request->input('shop_id'))
-            ->where('status',OrderStatusEnum::DELIVERY->value)
+            ->whereNotIn('status', [OrderStatusEnum::PENDING->value, OrderStatusEnum::APPROVED->value])
             ->first();
 
         if ($order!=null)
