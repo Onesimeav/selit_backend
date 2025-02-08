@@ -23,8 +23,7 @@ class SearchShopRequest extends FormRequest
     {
         return [
             'search'=>'string',
-            'published'=>'boolean',
-            'shop_id'=>'integer',
+            'published'=>'boolean'
         ];
     }
 }
