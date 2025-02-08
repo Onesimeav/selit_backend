@@ -111,6 +111,10 @@ class ShopController extends Controller
     {
         $shop = Shop::where('owner_id',Auth::id());
 
+        if ($request->filled('shop_id')){
+            $shop->where('id',$request->input('shop_id'));
+        }
+
         if ($request->filled('search')){
             $search = $request->input('search');
             $shop->where('name','like',"%$search%");
