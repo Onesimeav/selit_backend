@@ -92,9 +92,13 @@ class ShopController extends Controller
     {
         if ($shopOwnershipService->isShopOwner($id))
         {
-            $shop = Shop::find($id);
-
-            $shop->publish = 'true';
+            $shop = Shop::findOrFail($id);
+            $published = $shop->publish;
+            if ($published){
+                $shop->publish = 'true';
+            }else{
+                $shop->publish = 'false';
+            }
             $shop->save();
             return response()->json([
                 'message'=>"Shop published"
