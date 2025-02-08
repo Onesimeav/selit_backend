@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Shop\ChangeShopMainColorRequest;
 use App\Http\Requests\Shop\ChooseShopTemplateRequest;
+use App\Http\Requests\Shop\SearchShopRequest;
 use App\Http\Requests\Shop\ShopCreationRequest;
 use App\Models\Order;
 use App\Models\Shop;
@@ -102,14 +103,28 @@ class ShopController extends Controller
         return response()->json([],403);
     }
 
-    public function getUserShops(): JsonResponse
+    public function getUserShops(SearchShopRequest $request): JsonResponse
     {
-        $shop = Shop::where('owner_id',Auth::id())->get();
+        $shop = Shop::where('owner_id',Auth::id());
+
+        if ($request->filled('search')){
+            $search = $request->input('search');
+            $shop->where('name','like',"%$search%");
+        }
+
+        if ($request->filled('published')){
+          $published = $request->input('published');
+          if ($published){
+              $shop->where('publish','true');
+          }else{
+              $shop->where('publish','false');
+          }
+        }
 
         if ($shop){
             return response()->json([
                 'message'=>'Shop retrieved successfully',
-                'shop'=>$shop->toArray(),
+                'shop'=>$shop->get()->toArray(),
             ]);
         }
 
