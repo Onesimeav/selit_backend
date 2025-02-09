@@ -19,7 +19,7 @@ class SubdomainController extends Controller
         }
 
         if (!$shop->publish){
-            if ($shop->owner_id==Auth::id()){
+            if ($shop->owner_id===Auth::id()){
                 return response()->json([
                     'message'=>'Shops retrived successfully',
                     'shop'=>$shop->toArray(),
