@@ -19,7 +19,8 @@ class SubdomainController extends Controller
         }
 
         if (!$shop->publish){
-            if ($shop->owner_id===Auth::id()){
+            $user = Auth::guard('sanctum')->user();
+            if ($user && $shop->owner_id==$user->id){
                 return response()->json([
                     'message'=>'Shops retrived successfully',
                     'shop'=>$shop->toArray(),
@@ -51,7 +52,8 @@ class SubdomainController extends Controller
         $categories=$shop->categories()->paginate(15)->toArray();
 
         if (!$shop->publish){
-            if ($shop->owner_id==Auth::id()){
+            $user = Auth::guard('sanctum')->user();
+            if ($user && $shop->owner_id==$user->id){
                 return response()->json([
                     'message'=>'Categories retrived successfully',
                     'categories'=>$categories,
@@ -79,7 +81,8 @@ class SubdomainController extends Controller
         $products = $shop->products()->paginate(15)->toArray();
 
         if (!$shop->publish){
-            if ($shop->owner_id==Auth::id()){
+            $user = Auth::guard('sanctum')->user();
+            if ($user && $shop->owner_id==$user->id){
                 return response()->json([
                     'message'=>'Products retrived successfully',
                     'products'=>$products,
@@ -114,7 +117,8 @@ class SubdomainController extends Controller
             $products = $category->products()->paginate(15)->toArray();
 
             if (!$shop->publish) {
-                if ($shop->owner_id == Auth::id()) {
+                $user = Auth::guard('sanctum')->user();
+                if ($user && $shop->owner_id==$user->id){
                     return response()->json([
                         'message' => 'Products retrieved successfully',
                         'products' => $products,
