@@ -95,9 +95,9 @@ class ShopController extends Controller
             $shop = Shop::findOrFail($id);
             $published = $shop->publish;
             if ($published){
-                $shop->publish = 'true';
-            }else{
                 $shop->publish = 'false';
+            }else{
+                $shop->publish = 'true';
             }
             $shop->save();
             return response()->json([

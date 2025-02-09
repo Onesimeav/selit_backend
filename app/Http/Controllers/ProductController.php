@@ -377,7 +377,7 @@ class ProductController extends Controller
 
     public function addToShop(AddToShopRequest $request, ProductOwnershipService $productOwnershipService, ShopOwnershipService $shopOwnershipService): JsonResponse
     {
-        $productsId = $request->input('product_id');
+        $productsId = $request->input('products');
         $shopId= $request->input('shop_id');
 
         if ($shopOwnershipService->isShopOwner($shopId))
