@@ -367,7 +367,7 @@ class OrderController extends Controller
                 //update user balance
                 $shop=Shop::findOrFail($order->shop_id);
                 $user = User::findOrFail($shop->owner_id);
-                $user->balance = $orderPrice;
+                $user->balance = ($orderPrice+$user->balance);
                 $user->save();
 
                 //update order state

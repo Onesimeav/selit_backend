@@ -5,6 +5,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PromotionController;
 use App\Http\Controllers\ShopController;
+use App\Http\Controllers\StatsController;
 use App\Http\Controllers\SubdomainController;
 use App\Http\Controllers\TemplateController;
 use App\Http\Controllers\UserAuthenticationController;
@@ -90,6 +91,11 @@ Route::middleware(['auth:sanctum','verified'])->group(function () {
     Route::put('/orders/approve-order/{orderId}',[OrderController::class,'setOrderStateAsApproved']);
     Route::put('/orders/delivery-order',[OrderController::class,'setOrderStateAsDelivery']);
     Route::get('/orders/get-invoice/{orderReference}',[OrderController::class,'getOrderInvoice']);
+    //stats
+    Route::get('/stats/total-orders',[StatsController::class,'getTotalOrders']);
+    Route::get('/stats/annual-revenue-rate',[StatsController::class,'getTotalOrderPrices']);
+    Route::get('/stats/total-order-evolution',[StatsController::class,'getOrderEvolution']);
+    Route::get('/stats/total-revenue-evolution',[StatsController::class,'getOrderPriceEvolution']);
 });
 //only admins
 Route::middleware(['auth:sanctum','admin'])->group(function () {
