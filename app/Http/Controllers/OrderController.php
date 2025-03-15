@@ -412,7 +412,7 @@ class OrderController extends Controller
 
     public function getOrderInvoice(ShopOwnershipService $shopOwnershipService, $orderReference): JsonResponse
     {
-        $order = Order::where('order_reference',$orderReference)->get();
+        $order = Order::where('order_reference',$orderReference)->first();
 
         if ($order!=null)
         {
@@ -463,7 +463,7 @@ class OrderController extends Controller
 
         if ($order!=null)
         {
-            if ($shopOwnershipService->isShopOwner($order->shop_id))
+            if (Shop::where('id',$order->shop_id)->where('owner_id',Auth::guard('sanctum')->id())->exists())
             {
                 $order->status=OrderStatusEnum::CANCELED;
                 $order->save();
@@ -478,7 +478,6 @@ class OrderController extends Controller
             {
                 if ($request->filled('secret') && $order->secret===$request->integer('secret'))
                 {
-
                     $order->status=OrderStatusEnum::CANCELED;
                     $order->save();
                     $shop=Shop::findOrFail($order->shop_id);
