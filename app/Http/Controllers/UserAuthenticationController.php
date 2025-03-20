@@ -87,7 +87,7 @@ class UserAuthenticationController extends Controller
 
         if (!$user->isAdmin){
             return response()->json([
-                'message' => 'Not allowed to access ressources'
+                'message' => 'Not allowed to access resources'
             ], 401);
         }
 
