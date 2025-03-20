@@ -14,6 +14,7 @@ use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('login', [UserAuthenticationController::class, 'login']);
+Route::get('/admin-login', [UserAuthenticationController::class, 'loginAdmin']);
 Route::post('register', [UserAuthenticationController::class, 'register']);
 Route::get('send-test-mail', [MailController::class, 'index']);
 Route::get('/google-auth', [UserAuthenticationController::class, 'redirectToGoogleAuth']);
