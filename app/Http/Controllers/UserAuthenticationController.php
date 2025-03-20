@@ -68,6 +68,37 @@ class UserAuthenticationController extends Controller
         ],200);
     }
 
+    public function loginAdmin(LoginRequest $request): JsonResponse
+    {
+        $email = $request->input('email');
+        $password = $request->input('password');
+
+        $credentials = [
+            'email' => $email,
+            'password' => $password
+        ];
+        if (!Auth::attempt($credentials)) {
+            return response()->json([
+                'message' => 'Invalid login credentials'
+            ], 401);
+        }
+
+        $user = User::where('email', $request['email'])->firstOrFail();
+
+        if (!$user->isAdmin){
+            return response()->json([
+                'message' => 'Not allowed to access ressources'
+            ], 401);
+        }
+
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        return response()->json([
+            'access_token' => $token,
+            'token_type' => 'Bearer',
+        ],200);
+    }
+
     public function logout(): JsonResponse
     {
         auth()->user()->tokens()->delete();
