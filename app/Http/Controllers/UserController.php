@@ -63,8 +63,8 @@ class UserController extends Controller
 
     public function getWithdrawalRequests(): JsonResponse
     {
-        $withdrawal= Withdrawal::paginate(15);
-
+        $withdrawal= Withdrawal::orderBy('created_at','desc')
+            ->paginate(15);
 
         return response()->json([
             'result'=>$withdrawal,

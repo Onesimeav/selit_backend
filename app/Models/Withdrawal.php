@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use phpDocumentor\Reflection\Types\Boolean;
 
 /**
@@ -39,4 +40,13 @@ class Withdrawal extends Model
         'user_id',
         'done',
     ];
+
+    protected $with=[
+        'user'
+    ];
+
+    public function user():HasOne
+    {
+        return $this->hasOne(User::class);
+    }
 }
