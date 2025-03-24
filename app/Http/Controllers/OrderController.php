@@ -116,7 +116,9 @@ class OrderController extends Controller
     public function getOrders(ShopOwnershipService $shopOwnershipService,OrderSearchRequest $request): JsonResponse
     {
 
-        $userShops = Shop::where('owner_id',Auth::id())->orderBy('created_at','desc')->get();
+        $userShops = Shop::where('owner_id', Auth::id())
+            ->latest('created_at')
+            ->get();
         $shopIds =[];
         foreach ($userShops as $shop){
             $shopIds[]=$shop->id;
