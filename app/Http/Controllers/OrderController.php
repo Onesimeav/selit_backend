@@ -439,8 +439,8 @@ class OrderController extends Controller
                     $orderProductsData[]=$orderProduct;
                 }
                 $pdf = Pdf::loadView('order.invoice', ['customerName'=>"$order->name $order->surname", 'shopName'=>$shop->name, 'orderProducts'=>$orderProductsData, 'orderPrice'=>$orderPrice, 'orderReference'=>$orderReference]);
-
-                Mail::to($user->email)->send(new \App\Mail\Seller\SendFinishedOrderMail($shop->name,$user->name,$order->order_reference,$orderProductsData,$pdf));
+                $pdfContent = base64_encode($pdf->output());
+                Mail::to($user->email)->send(new \App\Mail\Seller\SendFinishedOrderMail($shop->name,$user->name,$order->order_reference,$orderProductsData,$pdfContent));
 
                 return response()->json([
                     'message'=>'The invoice have been successfully sent'
