@@ -117,7 +117,8 @@ class OrderController extends Controller
     {
 
         $userShops = Shop::where('owner_id', Auth::id())
-            ->orderByDesc('created_at')
+            ->orderBy('created_at', 'desc')
+            ->orderBy('id', 'desc')
             ->get();
         $shopIds =[];
         foreach ($userShops as $shop){
