@@ -117,7 +117,7 @@ class OrderController extends Controller
     {
 
         $userShops = Shop::where('owner_id', Auth::id())
-            ->latest('created_at')
+            ->orderByDesc('created_at')
             ->get();
         $shopIds =[];
         foreach ($userShops as $shop){
@@ -180,7 +180,6 @@ class OrderController extends Controller
         });
 
         return response()->json([
-            'bbl'=>'bbl',
             'orders' => $ordersData
         ]);
     }
