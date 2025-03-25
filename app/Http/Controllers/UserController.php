@@ -53,7 +53,7 @@ class UserController extends Controller
     {
         $withdrawal=Withdrawal::findOrFail($id);
         $withdrawal->update([
-            'status'=>true
+            'status'=>'true'
         ]);
 
         return response()->json([
