@@ -52,9 +52,8 @@ class UserController extends Controller
     public function validateWithdrawal($id): JsonResponse
     {
         $withdrawal=Withdrawal::findOrFail($id);
-        $withdrawal->update([
-            'status'=>'true'
-        ]);
+        $withdrawal->status = 'true';
+        $withdrawal->save();
 
         return response()->json([
             'message'=>'Withdrawal validated successfully',
