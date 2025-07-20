@@ -9,5 +9,5 @@ jobs:
   curl:
     runs-on: ubuntu-latest
     steps:
-      - run: curl https://selit-backend.onrender.com/api/v1/ 
+      # - run: curl https://selit-backend.onrender.com/api/v1/ 
       - run: curl https://n8n-instance-vowt.onrender.com/
